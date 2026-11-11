@@ -141,6 +141,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
     <button class="nav on" data-t="ov"><i>◈</i>نظرة عامة</button>
     <button class="nav" data-t="live"><i>⚡</i>البث المباشر</button>
     <button class="nav" data-t="users"><i>👥</i>المستخدمون</button>
+    <button class="nav" data-t="push"><i>📣</i>الإشعارات</button>
     <button class="nav" data-t="mod"><i>🛡</i>الرقابة<span class="bd hide" id="mb"></span></button>
     <button class="nav" data-t="log"><i>📜</i>سجل الإدارة</button>
     <div class="side-foot"><div id="me" style="word-break:break-all;margin-bottom:8px"></div><button class="btn sm" id="out">تسجيل الخروج</button></div>
@@ -152,6 +153,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
     <section id="v-ov"></section>
     <section id="v-live" class="hide"></section>
     <section id="v-users" class="hide"></section>
+    <section id="v-push" class="hide"></section>
     <section id="v-mod" class="hide"></section>
     <section id="v-log" class="hide"></section>
   </main>
@@ -166,7 +168,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefr
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=n=>Number(n||0).toLocaleString('en-US');
-const TITLES={ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة'};
+const TITLES={push:'إرسال إشعار',ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة'};
 const EV={
  signup:['👤','تسجيل جديد','var(--gr)'],login:['🔑','دخول','var(--cy)'],post:['💬','منشور بالمنتدى','var(--vi)'],comment:['↩️','تعليق','var(--vi)'],
  forum_report:['🚩','بلاغ منتدى','var(--rd)'],report:['📩','رسالة/بلاغ للدعم','var(--or)'],admin:['🛠','إجراء إداري','var(--gold)'],broadcast:['📣','إشعار جماعي','var(--gold)'],
@@ -207,10 +209,10 @@ document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.t));
 $('#rf').onclick=()=>load(true);
 function go(t){tab=t;try{localStorage.setItem('tab',t)}catch(_){}
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  ['ov','live','users','mod','log'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
+  ['ov','live','users','push','mod','log'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
   $('#ttl').textContent=TITLES[t];window.scrollTo(0,0);load(false)}
 async function load(force){
-  try{({ov:vOverview,live:vLive,users:vUsers,mod:vMod,log:vLog})[tab](force);setLive(true)}catch(e){setLive(false)}}
+  try{({ov:vOverview,live:vLive,users:vUsers,push:vPush,mod:vMod,log:vLog})[tab](force);setLive(true)}catch(e){setLive(false)}}
 function setLive(ok){$('#dot').classList.toggle('off',!ok);$('#lt').textContent=ok?'متصل':'انقطع الاتصال'}
 
 /* ===== overview ===== */
@@ -322,6 +324,41 @@ async function act(fn,args,ok){try{await rpc(fn,args);toast(ok);return true}catc
 async function doBan(id,ban){if(!confirm(ban?'حظر هذا المستخدم؟':'رفع الحظر؟'))return;if(await act('admin_set_ban',{p_user:id,p_ban:ban},ban?'تم الحظر':'رُفع الحظر')){openUser(id);load(true)}}
 async function doMsg(id){const t=prompt('عنوان الرسالة:');if(!t)return;const b=prompt('نص الرسالة:');if(!b)return;if(await act('admin_send_message',{p_user:id,p_title:t,p_body:b},'أُرسلت الرسالة'))openUser(id)}
 async function doDel(id,em){if(prompt('اكتب DELETE لتأكيد حذف الحساب نهائيًا: '+em)!=='DELETE')return;if(await act('admin_delete_user',{p_user:id},'حُذف الحساب')){closeDr();load(true)}}
+
+/* ===== push ===== */
+async function vPush(){
+  if(!$('#pt')){
+    let grades=[];try{const o=await rpc('admin_overview');grades=Object.keys(o.by_grade||{}).filter(g=>g!=='؟')}catch(_){}
+    $('#v-push').innerHTML=`<div class="grid two"><div class="card"><h3>📣 إشعار على هواتف الطلاب</h3>
+     <div class="row" style="margin-top:0"><div style="flex:1;min-width:200px"><label style="color:var(--mut);font-size:13px">المستلمون</label><select id="pg"><option value="">كل المستخدمين</option>${grades.map(g=>`<option value="${esc(g)}">${esc(GR[g]||g)}</option>`).join('')}</select></div></div>
+     <input id="pt" placeholder="عنوان الإشعار" maxlength="80" style="margin-bottom:10px">
+     <textarea id="pb" rows="4" placeholder="نص الإشعار" maxlength="300" style="margin-bottom:10px"></textarea>
+     <input id="pi" placeholder="رابط صورة (اختياري، https)" style="direction:ltr;margin-bottom:12px">
+     <div class="row" style="margin:0"><button class="btn pri" id="ps">🚀 إرسال الآن</button><span id="pr" style="color:var(--mut);align-self:center;font-size:13px"></span></div>
+     <p style="color:var(--mut);font-size:12.5px;margin-top:12px;line-height:1.7">يصل للهاتف حتى لو التطبيق مغلق والشاشة مقفلة (عبر Firebase)، بشرط أن يكون الطالب فتح التطبيق وسمح بالإشعارات مرة واحدة.</p></div>
+     <div class="card"><h3>👀 معاينة</h3><div class="ev" style="--c:var(--gold)"><div class="ic">م</div><div class="bd"><div class="h"><b>معلّمي</b><span class="tm">الآن</span></div><p><b id="vt">العنوان</b><br><span id="vb">النص يظهر هنا</span></p></div></div>
+     <h3 style="margin-top:22px">🕘 آخر الإشعارات المرسلة</h3><div id="ph"></div></div></div>`;
+    const upd=()=>{$('#vt').textContent=$('#pt').value||'العنوان';$('#vb').textContent=$('#pb').value||'النص يظهر هنا'};
+    $('#pt').oninput=upd;$('#pb').oninput=upd;
+    $('#ps').onclick=async()=>{
+      const title=$('#pt').value.trim(),body=$('#pb').value.trim(),grade=$('#pg').value,image=$('#pi').value.trim();
+      if(!title||!body)return toast('اكتب العنوان والنص');
+      if(image&&!/^https:\/\//.test(image))return toast('رابط الصورة لازم يبدأ بـ https');
+      if(!confirm('إرسال إلى: '+(grade?(GR[grade]||grade):'كل المستخدمين')+'؟'))return;
+      $('#ps').disabled=true;$('#pr').textContent='جارٍ الإرسال…';
+      const payload={title,body};if(grade)payload.grade=grade;if(image)payload.image=image;
+      const {data,error}=await sb.functions.invoke('send-push',{body:payload});
+      $('#ps').disabled=false;
+      if(error){let m=error.message;try{m=await error.context.text()}catch(_){}$('#pr').textContent='';toast('فشل: '+m.slice(0,160));return}
+      $('#pr').textContent='✓ '+(typeof data==='string'?data:JSON.stringify(data)).slice(0,120);toast('تم الإرسال');
+      $('#pt').value='';$('#pb').value='';$('#pi').value='';upd();loadHist();
+    };
+  }
+  loadHist();
+}
+async function loadHist(){
+  const {data}=await sb.from('notifications').select('title,body,target_grade,created_at').order('created_at',{ascending:false}).limit(12);
+  $('#ph').innerHTML=(data&&data.length)?data.map(n=>`<div class="mini"><b>${esc(n.title)}</b> <span class="pill p-m">${esc(n.target_grade?(GR[n.target_grade]||n.target_grade):'الكل')}</span><br>${esc(n.body)}<small>${full(n.created_at)}</small></div>`).join(''):'<div class="empty">لا شيء بعد</div>'}
 
 /* ===== moderation ===== */
 async function vMod(){
