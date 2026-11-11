@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>معلّمي — مركز القيادة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#07080d;--bg2:#0d0f18;--card:#11141f;--card2:#161a28;--line:#232842;--tx:#eef0f8;--mut:#8b91ad;--gold:#e8c46a;--gold2:#b8902f;--cy:#52d6ff;--vi:#9a7bff;--gr:#3ddc97;--rd:#ff5d73;--or:#ffa94d}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Tajawal,system-ui,sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;font-size:15px}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 85% -10%,rgba(154,123,255,.18),transparent 60%),radial-gradient(700px 500px at 0% 110%,rgba(232,196,106,.12),transparent 60%),radial-gradient(600px 400px at 50% 50%,rgba(82,214,255,.05),transparent 70%)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;outline:0;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{padding:10px 16px;border-radius:12px;background:var(--card2);border:1px solid var(--line);font-weight:700;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--gold)}
+.btn.pri{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1405;border:0}
+.btn.red{color:var(--rd);border-color:rgba(255,93,115,.4)}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px}
+.hide{display:none!important}
+
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.lbox{width:100%;max-width:400px;background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:26px;padding:34px 28px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(232,196,106,.08) inset;text-align:center}
+.logo{width:74px;height:74px;margin:0 auto 14px;border-radius:22px;display:grid;place-items:center;font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1405;box-shadow:0 10px 40px rgba(232,196,106,.35)}
+.lbox h1{font-size:26px;font-weight:800}.lbox p{color:var(--mut);margin:6px 0 22px}
+.lbox input{margin-bottom:12px;text-align:center;direction:ltr}
+.err{color:var(--rd);font-size:13px;min-height:18px;margin-bottom:8px}
+
+/* layout */
+#app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;padding:22px 14px;border-left:1px solid var(--line);background:rgba(13,15,24,.7);backdrop-filter:blur(14px);display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 8px 20px}
+.brand .logo{width:42px;height:42px;font-size:22px;border-radius:13px;margin:0;box-shadow:none}
+.brand b{font-size:18px;display:block}.brand small{color:var(--mut);font-size:12px}
+.nav{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;color:var(--mut);font-weight:700;text-align:right;transition:.15s;position:relative}
+.nav:hover{color:var(--tx);background:var(--card)}
+.nav.on{color:var(--gold);background:linear-gradient(90deg,rgba(232,196,106,.14),transparent);}
+.nav.on:before{content:"";position:absolute;right:0;top:20%;bottom:20%;width:3px;border-radius:3px;background:var(--gold)}
+.nav i{font-style:normal;font-size:19px;width:24px;text-align:center}
+.nav .bd{margin-right:auto;background:var(--rd);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px}
+.side-foot{margin-top:auto;padding:10px;color:var(--mut);font-size:12px}
+main{padding:24px 28px 60px;min-width:0}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.top h2{font-size:26px;font-weight:800}
+.top .sp{flex:1}
+.live{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:13px;padding:7px 13px;border:1px solid var(--line);border-radius:99px;background:var(--card)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--gr);box-shadow:0 0 0 0 rgba(61,220,151,.7);animation:pl 1.6s infinite}
+.dot.off{background:var(--rd);animation:none}
+@keyframes pl{70%{box-shadow:0 0 0 9px rgba(61,220,151,0)}100%{box-shadow:0 0 0 0 rgba(61,220,151,0)}}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));margin-bottom:18px}
+.kpi{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:20px;padding:18px;position:relative;overflow:hidden}
+.kpi:after{content:"";position:absolute;left:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:var(--c,var(--gold));opacity:.10;filter:blur(8px)}
+.kpi small{color:var(--mut);font-weight:500;display:flex;gap:7px;align-items:center}
+.kpi .n{font-size:34px;font-weight:800;margin-top:8px;font-variant-numeric:tabular-nums;color:var(--c,var(--tx))}
+.kpi .s{color:var(--mut);font-size:12.5px;margin-top:3px}
+.card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);border-radius:22px;padding:20px}
+.card h3{font-size:16px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+.two{grid-template-columns:1.7fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{padding:6px 13px;border-radius:99px;border:1px solid var(--line);color:var(--mut);font-size:13px;font-weight:700;background:var(--bg2)}
+.chip.on{color:#1a1405;background:var(--gold);border-color:var(--gold)}
+svg text{font-family:Tajawal,sans-serif}
+.bar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13.5px}
+.bar .l{width:88px;color:var(--mut);flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .t{flex:1;height:10px;border-radius:9px;background:var(--bg);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--vi),var(--cy));transition:width .8s}
+.bar .v{width:34px;text-align:left;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* feed */
+.feed{display:flex;flex-direction:column;gap:9px}
+.ev{display:flex;gap:13px;align-items:flex-start;padding:13px 14px;border-radius:16px;background:var(--card);border:1px solid var(--line);animation:in .5s}
+.ev.new{border-color:var(--gold);box-shadow:0 0 0 1px rgba(232,196,106,.35),0 0 28px rgba(232,196,106,.12)}
+@keyframes in{from{opacity:0;transform:translateY(-8px)}}
+.ev .ic{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:19px;flex:none;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.ev .bd{flex:1;min-width:0}
+.ev .h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ev .h b{font-weight:800}.ev .tag{font-size:11.5px;padding:2px 9px;border-radius:99px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);font-weight:700}
+.ev .tm{margin-right:auto;color:var(--mut);font-size:12px;white-space:nowrap}
+.ev p{color:#c5c9de;margin-top:5px;word-break:break-word;line-height:1.6}
+a.who{cursor:pointer;color:var(--cy)}
+/* table */
+.tw{overflow-x:auto;border-radius:18px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{font-size:12.5px;color:var(--mut);text-align:right;padding:12px 14px;background:var(--card);font-weight:700;position:sticky;top:0}
+td{padding:12px 14px;border-top:1px solid var(--line);font-size:14px}
+tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
+.av{width:34px;height:34px;border-radius:11px;display:inline-grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--vi),var(--cy));color:#0a0a14;vertical-align:middle;margin-left:9px}
+.pill{font-size:11.5px;padding:2px 9px;border-radius:99px;font-weight:700;display:inline-block}
+.p-g{background:rgba(61,220,151,.15);color:var(--gr)}.p-r{background:rgba(255,93,115,.15);color:var(--rd)}.p-y{background:rgba(232,196,106,.16);color:var(--gold)}.p-v{background:rgba(154,123,255,.17);color:var(--vi)}.p-m{background:var(--card2);color:var(--mut)}
+.srch{display:flex;gap:10px;margin-bottom:14px}
+/* drawer */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:50;display:flex;justify-content:flex-start}
+.dr{width:min(560px,100%);height:100%;background:var(--bg2);border-right:1px solid var(--line);overflow-y:auto;padding:22px;animation:sl .25s}
+@keyframes sl{from{transform:translateX(-40px);opacity:0}}
+.dr h3{font-size:20px}.row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:14px;margin:14px 0}.kv span:nth-child(odd){color:var(--mut)}
+.sec{margin-top:20px}.sec h4{color:var(--gold);margin-bottom:8px;font-size:14px}
+.mini{padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);margin-bottom:7px;font-size:13.5px;line-height:1.6;word-break:break-word}
+.mini small{color:var(--mut);display:block}
+.empty{color:var(--mut);text-align:center;padding:30px}
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--gold);padding:11px 20px;border-radius:14px;z-index:99;opacity:0;pointer-events:none;transition:.25s;max-width:90vw}
+#toast.s{opacity:1}
+.mod2{grid-template-columns:1fr 1fr}
+@media(max-width:900px){
+ #app{grid-template-columns:1fr}
+ aside{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom));border:0;border-top:1px solid var(--line);z-index:40;justify-content:space-around;gap:0}
+ .brand,.side-foot{display:none}
+ .nav{flex-direction:column;gap:2px;padding:7px 8px;font-size:11px;flex:1;align-items:center;border-radius:12px}
+ .nav.on:before{display:none}.nav .bd{position:absolute;top:2px;margin:0;left:16%}
+ main{padding:16px 14px 100px}
+ .two,.three,.mod2{grid-template-columns:1fr}
+ .top h2{font-size:21px}.kpi .n{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form class="lbox" id="lf">
+    <div class="logo">م</div>
+    <h1 class="gold">مركز القيادة</h1>
+    <p>لوحة تحكم معلّمي — للمشرفين فقط</p>
+    <input id="em" type="email" placeholder="البريد الإلكتروني" autocomplete="username" required>
+    <input id="pw" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
+    <div class="err" id="le"></div>
+    <button class="btn pri" style="width:100%;padding:13px" id="lb">دخول</button>
+  </form>
+</div>
+
+<div id="app" class="hide">
+  <aside>
+    <div class="brand"><div class="logo">م</div><div><b class="gold">معلّمي</b><small>مركز القيادة</small></div></div>
+    <button class="nav on" data-t="ov"><i>◈</i>نظرة عامة</button>
+    <button class="nav" data-t="live"><i>⚡</i>البث المباشر</button>
+    <button class="nav" data-t="users"><i>👥</i>المستخدمون</button>
+    <button class="nav" data-t="mod"><i>🛡</i>الرقابة<span class="bd hide" id="mb"></span></button>
+    <button class="nav" data-t="log"><i>📜</i>سجل الإدارة</button>
+    <div class="side-foot"><div id="me" style="word-break:break-all;margin-bottom:8px"></div><button class="btn sm" id="out">تسجيل الخروج</button></div>
+  </aside>
+  <main>
+    <div class="top"><h2 id="ttl"></h2><div class="sp"></div>
+      <div class="live"><span class="dot" id="dot"></span><span id="lt">متصل</span></div>
+      <button class="btn sm" id="rf">↻ تحديث</button></div>
+    <section id="v-ov"></section>
+    <section id="v-live" class="hide"></section>
+    <section id="v-users" class="hide"></section>
+    <section id="v-mod" class="hide"></section>
+    <section id="v-log" class="hide"></section>
+  </main>
+</div>
+<div id="dw"></div>
+<div id="toast"></div>
+
+<script>
+const SB_URL='https://cqufhwvbyxqddsammqks.supabase.co';
+const SB_KEY='sb_publishable_bs9Q5AYXNM2ZpEgWNx804g__oS5aIZI';
+const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>Number(n||0).toLocaleString('en-US');
+const TITLES={ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة'};
+const EV={
+ signup:['👤','تسجيل جديد','var(--gr)'],login:['🔑','دخول','var(--cy)'],post:['💬','منشور بالمنتدى','var(--vi)'],comment:['↩️','تعليق','var(--vi)'],
+ forum_report:['🚩','بلاغ منتدى','var(--rd)'],report:['📩','رسالة/بلاغ للدعم','var(--or)'],admin:['🛠','إجراء إداري','var(--gold)'],broadcast:['📣','إشعار جماعي','var(--gold)'],
+ task:['📝','مهمة دراسة','var(--cy)'],progress:['📈','تقدم دراسي','var(--gr)'],book:['📚','كتاب جديد','var(--gold)'],video:['🎬','فيديو جديد','var(--gold)'],
+ question:['❓','سؤال جديد','var(--gold)'],teacher_book:['🧑‍🏫','دليل معلم','var(--gold)']};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('s');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('s'),2800)}
+async function rpc(fn,args){const {data,error}=await sb.rpc(fn,args||{});if(error)throw new Error(error.message);return data}
+function ago(ts){if(!ts)return'—';const s=(Date.now()-new Date(ts))/1000;if(s<45)return'الآن';if(s<3600)return'قبل '+Math.round(s/60)+' د';if(s<86400)return'قبل '+Math.round(s/3600)+' س';if(s<2592000)return'قبل '+Math.round(s/86400)+' يوم';return new Date(ts).toLocaleDateString('ar-LY')}
+const full=ts=>ts?new Date(ts).toLocaleString('ar-LY'):'—';
+const isBan=p=>p.banned===true||p.is_banned===true;
+const ini=p=>esc(((p.name||p.full_name||p.email||'؟').trim()[0]||'؟'));
+
+/* ===== auth ===== */
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session) await enter(session);
+}
+async function enter(session){
+  try{
+    const ok=await rpc('is_admin_user');
+    if(!ok) throw new Error('هذا الحساب ليس أدمن');
+  }catch(e){await sb.auth.signOut();$('#le').textContent=e.message;$('#login').classList.remove('hide');$('#app').classList.add('hide');return}
+  $('#login').classList.add('hide');$('#app').classList.remove('hide');
+  $('#me').textContent=session.user.email;
+  go(localStorage.getItem('tab')||'ov');
+  startPoll();
+}
+$('#lf').onsubmit=async e=>{e.preventDefault();$('#le').textContent='';$('#lb').disabled=true;
+  const {data,error}=await sb.auth.signInWithPassword({email:$('#em').value.trim(),password:$('#pw').value});
+  $('#lb').disabled=false;
+  if(error){$('#le').textContent='بيانات الدخول غير صحيحة';return}
+  enter(data.session)};
+$('#out').onclick=async()=>{stopPoll();await sb.auth.signOut();location.reload()};
+
+/* ===== nav ===== */
+let tab='ov';
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.t));
+$('#rf').onclick=()=>load(true);
+function go(t){tab=t;try{localStorage.setItem('tab',t)}catch(_){}
+  document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  ['ov','live','users','mod','log'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
+  $('#ttl').textContent=TITLES[t];window.scrollTo(0,0);load(false)}
+async function load(force){
+  try{({ov:vOverview,live:vLive,users:vUsers,mod:vMod,log:vLog})[tab](force);setLive(true)}catch(e){setLive(false)}}
+function setLive(ok){$('#dot').classList.toggle('off',!ok);$('#lt').textContent=ok?'متصل':'انقطع الاتصال'}
+
+/* ===== overview ===== */
+let serMetric='signups',serData=[];
+function countUp(el,to){const t0=performance.now(),d=900;const f=t=>{const p=Math.min(1,(t-t0)/d);el.textContent=nf(Math.round(to*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+const GR={g1:'1 ابتدائي',g2:'2 ابتدائي',g3:'3 ابتدائي',g4:'4 ابتدائي',g5:'5 ابتدائي',g6:'6 ابتدائي',g7:'7 أساسي',g8:'8 أساسي',g9:'9 أساسي'};
+function bars(obj,max){const e=Object.entries(obj).sort((a,b)=>b[1]-a[1]);const m=max||Math.max(1,...e.map(x=>x[1]));
+  return e.length?e.map(([k,v])=>`<div class="bar"><span class="l" title="${esc(k)}">${esc(GR[k]||k)}</span><span class="t"><i style="width:${v/m*100}%"></i></span><span class="v">${nf(v)}</span></div>`).join(''):'<div class="empty">لا بيانات</div>'}
+function kpi(l,n,s,c,ic){return `<div class="kpi" style="--c:${c}"><small>${ic} ${l}</small><div class="n" data-n="${n}">0</div><div class="s">${s||'&nbsp;'}</div></div>`}
+async function vOverview(){
+  const [o,s]=await Promise.all([rpc('admin_overview'),rpc('admin_series',{p_days:30})]);serData=s;
+  const rs=o.reports_by_status||{};
+  $('#v-ov').innerHTML=`
+  <div class="grid kpis">
+   ${kpi('إجمالي المستخدمين',o.users,`+${nf(o.users_today)} اليوم · +${nf(o.users_7d)} هذا الأسبوع`,'var(--gold)','👥')}
+   ${kpi('نشطون آخر 24 ساعة',o.active_24h,`${nf(o.active_7d)} خلال 7 أيام`,'var(--gr)','🟢')}
+   ${kpi('أجهزة بإشعارات',o.devices,'مستخدمون فعّلوا الإشعارات','var(--cy)','🔔')}
+   ${kpi('استخدام المعلم الذكي اليوم',o.ai_today,`${nf(o.ai_users_today)} طالب · الإجمالي ${nf(o.ai_total)}`,'var(--vi)','🤖')}
+   ${kpi('منشورات المنتدى',o.posts,`+${nf(o.posts_today)} اليوم`,'var(--vi)','💬')}
+   ${kpi('التعليقات',o.comments,`+${nf(o.comments_today)} اليوم · مخفي ${nf(o.hidden)}`,'var(--vi)','↩️')}
+   ${kpi('بلاغات الدعم',o.reports,Object.entries(rs).map(([k,v])=>k+': '+v).join(' · '),'var(--or)','📩')}
+   ${kpi('بلاغات المنتدى',o.forum_reports,`محظورون ${nf(o.banned)} · مكتومون ${nf(o.forum_mutes)}`,'var(--rd)','🚩')}
+  </div>
+  <div class="grid two" style="margin-bottom:16px">
+   <div class="card"><h3>📊 نشاط آخر 30 يوم</h3>
+    <div class="tabs" id="sm">${[['signups','تسجيلات'],['logins','دخول'],['posts','منشورات'],['comments','تعليقات'],['ai','المعلم الذكي'],['reports','بلاغات'],['tasks','مهام']].map(([k,l])=>`<button class="chip ${k===serMetric?'on':''}" data-k="${k}">${l}</button>`).join('')}</div>
+    <div id="ch"></div></div>
+   <div class="card"><h3>🎓 توزيع الصفوف</h3>${bars(o.by_grade)}</div>
+  </div>
+  <div class="grid three">
+   <div class="card"><h3>📍 المناطق</h3>${bars(o.by_region)}</div>
+   <div class="card"><h3>🧩 الأدوار</h3>${bars(o.by_role)}</div>
+   <div class="card"><h3>📦 المحتوى</h3>
+     ${bars({'كتب':o.books,'أدلة المعلم':o.teacher_books,'فيديوهات':o.videos,'أسئلة':o.questions,'إشعارات مرسلة':o.notifications,'رسائل الوارد':o.inbox_total,'مهام الدراسة':o.tasks,'مهام منجزة':o.tasks_done})}</div>
+  </div>`;
+  document.querySelectorAll('.kpi .n').forEach(e=>countUp(e,+e.dataset.n));
+  document.querySelectorAll('#sm .chip').forEach(c=>c.onclick=()=>{serMetric=c.dataset.k;document.querySelectorAll('#sm .chip').forEach(x=>x.classList.toggle('on',x===c));draw()});
+  draw();
+}
+function draw(){
+  const d=serData,W=700,H=240,P=30,vals=d.map(x=>+x[serMetric]||0),mx=Math.max(1,...vals),
+   X=i=>P+i*(W-2*P)/Math.max(1,d.length-1),Y=v=>H-26-(v/mx)*(H-56);
+  const pts=vals.map((v,i)=>[X(i),Y(v)]);
+  let path='M'+pts.map(p=>p.join(',')).join(' L'),area=path+` L${X(d.length-1)},${H-26} L${X(0)},${H-26}Z`;
+  const grid=[0,.25,.5,.75,1].map(f=>`<line x1="${P}" x2="${W-P}" y1="${Y(mx*f)}" y2="${Y(mx*f)}" stroke="#232842" stroke-dasharray="3 5"/><text x="${P-6}" y="${Y(mx*f)+4}" fill="#8b91ad" font-size="11" text-anchor="end">${Math.round(mx*f)}</text>`).join('');
+  const lbl=d.map((x,i)=>i%6===0?`<text x="${X(i)}" y="${H-6}" fill="#8b91ad" font-size="11" text-anchor="middle">${x.d.slice(5)}</text>`:'').join('');
+  $('#ch').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;direction:ltr"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8c46a" stop-opacity=".45"/><stop offset="1" stop-color="#e8c46a" stop-opacity="0"/></linearGradient></defs>${grid}${lbl}<path d="${area}" fill="url(#g)"/><path d="${path}" fill="none" stroke="#e8c46a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===pts.length-1?5:2.5}" fill="#e8c46a"><title>${d[i].d}: ${vals[i]}</title></circle>`).join('')}</svg>
+  <div style="color:var(--mut);font-size:13px;margin-top:6px">المجموع: <b style="color:var(--tx)">${nf(vals.reduce((a,b)=>a+b,0))}</b> · الأعلى في يوم: <b style="color:var(--tx)">${mx}</b></div>`;
+}
+
+/* ===== live feed ===== */
+let feedFilter='all',feedSeen=new Set(),feedFirst=true,feedPaused=false,lastFeed=[];
+const evKey=e=>e.k+'|'+e.ts+'|'+(e.actor||'')+'|'+e.t;
+function evHtml(e,isNew){const m=EV[e.k]||['•',e.k,'var(--mut)'];
+  const who=e.actor?`<a class="who" onclick="openUser('${e.actor}')">${esc(e.name||e.email||'مستخدم')}</a>${e.grade?` <span class="pill p-m">${esc(GR[e.grade]||e.grade)}</span>`:''}`:'<span style="color:var(--mut)">النظام</span>';
+  return `<div class="ev ${isNew?'new':''}" style="--c:${m[2]}"><div class="ic">${m[0]}</div><div class="bd"><div class="h"><span class="tag">${m[1]}</span><b>${who}</b><span class="tm" title="${full(e.ts)}">${ago(e.ts)}</span></div>${e.t?`<p>${esc(e.t)}</p>`:''}</div></div>`}
+async function vLive(force){
+  if(!$('#fl')){$('#v-live').innerHTML=`<div class="tabs" id="ft"></div><div class="row" style="margin-top:0"><button class="btn sm" id="fp">⏸ إيقاف التحديث</button><span style="color:var(--mut);font-size:13px;align-self:center">يتحدّث تلقائيًا كل 6 ثوانٍ — الأحداث الجديدة تتوهّج بالذهبي</span></div><div class="feed" id="fl"></div>`;
+    $('#fp').onclick=()=>{feedPaused=!feedPaused;$('#fp').textContent=feedPaused?'▶ استئناف':'⏸ إيقاف التحديث'}}
+  if(feedPaused&&!force)return;
+  lastFeed=await rpc('admin_feed',{p_limit:120});
+  renderFeed();
+}
+function renderFeed(){
+  const kinds=['all',...Object.keys(EV)];
+  $('#ft').innerHTML=kinds.map(k=>`<button class="chip ${k===feedFilter?'on':''}" data-k="${k}">${k==='all'?'الكل':EV[k][0]+' '+EV[k][1]}</button>`).join('');
+  $('#ft').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{feedFilter=c.dataset.k;renderFeed()});
+  const list=lastFeed.filter(e=>feedFilter==='all'||e.k===feedFilter);
+  $('#fl').innerHTML=list.length?list.map(e=>evHtml(e,!feedFirst&&!feedSeen.has(evKey(e)))).join(''):'<div class="empty">لا أحداث</div>';
+  lastFeed.forEach(e=>feedSeen.add(evKey(e)));feedFirst=false}
+
+/* ===== users ===== */
+let uq='',upage=0;const UP=40;
+async function vUsers(force){
+  if(!$('#uq')){$('#v-users').innerHTML=`<div class="srch"><input id="uq" placeholder="ابحث بالاسم أو الإيميل أو المنطقة أو الصف…"><button class="btn pri" id="ub">بحث</button></div><div id="ur"></div>`;
+    $('#ub').onclick=()=>{uq=$('#uq').value;upage=0;vUsers(true)};$('#uq').onkeydown=e=>{if(e.key==='Enter')$('#ub').click()}}
+  const r=await rpc('admin_users',{p_q:uq,p_limit:UP,p_offset:upage*UP});
+  const pages=Math.ceil(r.total/UP);
+  $('#ur').innerHTML=`<div style="color:var(--mut);margin-bottom:10px">النتائج: <b style="color:var(--tx)">${nf(r.total)}</b></div>
+  <div class="tw"><table><thead><tr><th>المستخدم</th><th>الصف</th><th>المنطقة</th><th>الدور</th><th>الانضمام</th><th>آخر دخول</th><th>نشاط</th><th>الحالة</th></tr></thead><tbody>
+  ${r.rows.map(u=>`<tr class="cl" onclick="openUser('${u.id}')"><td><span class="av">${ini(u)}</span>${esc(u.name||u.full_name||'—')}<div style="color:var(--mut);font-size:12px;margin-right:43px;direction:ltr;text-align:right">${esc(u.email)}</div></td>
+   <td>${esc(GR[u.grade]||u.grade||'—')}</td><td>${esc(u.region||'—')}</td><td><span class="pill ${u.role&&u.role!=='student'?'p-y':'p-m'}">${esc(u.role||'student')}</span></td>
+   <td>${ago(u.joined)}</td><td>${ago(u.last_sign_in)}</td><td style="color:var(--mut);font-size:12.5px">💬${u.posts} ↩️${u.comments} 🤖${u.ai_total}</td>
+   <td>${isBan(u)?'<span class="pill p-r">محظور</span>':u.muted?'<span class="pill p-y">مكتوم</span>':'<span class="pill p-g">نشط</span>'}</td></tr>`).join('')}
+  </tbody></table></div>
+  ${pages>1?`<div class="row" style="justify-content:center"><button class="btn sm" ${upage<=0?'disabled':''} onclick="upage--;vUsers(true)">السابق</button><span style="align-self:center;color:var(--mut)">${upage+1} / ${pages}</span><button class="btn sm" ${upage+1>=pages?'disabled':''} onclick="upage++;vUsers(true)">التالي</button></div>`:''}`;
+}
+async function openUser(id){
+  $('#dw').innerHTML=`<div class="ov" onclick="if(event.target===this)closeDr()"><div class="dr"><div class="empty">جارٍ التحميل…</div></div></div>`;
+  try{
+    const d=await rpc('admin_user_detail',{p_user:id});const p=d.profile||{},a=d.auth||{};const nm=p.name||p.full_name||a.email;
+    const list=(arr,f)=>arr&&arr.length?arr.map(f).join(''):'<div class="empty" style="padding:10px">لا شيء</div>';
+    $('#dw .dr').innerHTML=`
+     <div style="display:flex;gap:14px;align-items:center"><span class="av" style="width:56px;height:56px;font-size:24px;border-radius:17px;margin:0">${ini({name:nm})}</span><div style="flex:1"><h3>${esc(nm)}</h3><div style="color:var(--mut);direction:ltr;text-align:right">${esc(a.email)}</div></div><button class="btn sm" onclick="closeDr()">✕</button></div>
+     <div class="row">${isBan(p)?'<span class="pill p-r">محظور</span>':'<span class="pill p-g">نشط</span>'}${d.muted?'<span class="pill p-y">مكتوم بالمنتدى</span>':''}<span class="pill p-v">${esc(p.role||'student')}</span>${a.confirmed?'':'<span class="pill p-y">إيميل غير مؤكد</span>'}</div>
+     <div class="kv"><span>الصف</span><span>${esc(GR[p.grade]||p.grade||'—')}</span><span>المسار</span><span>${esc(p.track||'—')}</span><span>المنطقة</span><span>${esc(p.region||'—')}</span><span>النوع</span><span>${esc(p.type||'—')}</span><span>طريقة الدخول</span><span>${esc(a.provider||'—')}</span><span>انضم</span><span>${full(a.joined)}</span><span>آخر دخول</span><span>${full(a.last_sign_in)}</span><span>أجهزة إشعارات</span><span>${d.devices}</span><span>المعرّف</span><span style="direction:ltr;text-align:right;font-size:12px;color:var(--mut)">${esc(id)}</span></div>
+     <div class="row"><button class="btn ${isBan(p)?'':'red'}" onclick="doBan('${id}',${!isBan(p)})">${isBan(p)?'رفع الحظر':'حظر المستخدم'}</button><button class="btn" onclick="doMsg('${id}')">✉️ إرسال رسالة</button><button class="btn red" onclick="doDel('${id}','${esc(a.email)}')">🗑 حذف الحساب</button></div>
+     <div class="sec"><h4>🤖 استخدام المعلم الذكي (آخر 14 يوم)</h4>${list(d.ai,x=>`<div class="mini">${x.day} — <b>${x.n}</b> رسالة</div>`)}</div>
+     <div class="sec"><h4>💬 المنشورات</h4>${list(d.posts,x=>`<div class="mini">${esc(x.body)} ${x.hidden?'<span class="pill p-r">مخفي</span>':''}<small>${full(x.created_at)}</small></div>`)}</div>
+     <div class="sec"><h4>↩️ التعليقات</h4>${list(d.comments,x=>`<div class="mini">${esc(x.body)} ${x.hidden?'<span class="pill p-r">مخفي</span>':''}<small>${full(x.created_at)}</small></div>`)}</div>
+     <div class="sec"><h4>📩 بلاغاته/رسائله للدعم</h4>${list(d.reports,x=>`<div class="mini"><b>${esc(x.kind)}</b> · ${esc(x.status)}<br>${esc(x.message)}<small>${full(x.created_at)}</small></div>`)}</div>
+     <div class="sec"><h4>📈 التقدم الدراسي</h4>${list(d.progress,x=>`<div class="mini">${esc(x.subject)}: ${x.done}/${x.total}</div>`)}</div>
+     <div class="sec"><h4>📝 مهام الدراسة</h4>${list(d.tasks,x=>`<div class="mini">${x.done?'✅':'⬜'} ${esc(x.title)} <small>${esc(x.time||'')}</small></div>`)}</div>
+     <div class="sec"><h4>📥 الوارد</h4>${list(d.inbox,x=>`<div class="mini"><b>${esc(x.title)}</b> ${x.read?'':'<span class="pill p-y">غير مقروء</span>'}<br>${esc(x.body)}<small>${full(x.created_at)}</small></div>`)}</div>`;
+  }catch(e){$('#dw .dr').innerHTML=`<div class="empty">خطأ: ${esc(e.message)}</div><button class="btn" onclick="closeDr()">إغلاق</button>`}
+}
+function closeDr(){$('#dw').innerHTML=''}
+async function act(fn,args,ok){try{await rpc(fn,args);toast(ok);return true}catch(e){toast('فشل: '+e.message);return false}}
+async function doBan(id,ban){if(!confirm(ban?'حظر هذا المستخدم؟':'رفع الحظر؟'))return;if(await act('admin_set_ban',{p_user:id,p_ban:ban},ban?'تم الحظر':'رُفع الحظر')){openUser(id);load(true)}}
+async function doMsg(id){const t=prompt('عنوان الرسالة:');if(!t)return;const b=prompt('نص الرسالة:');if(!b)return;if(await act('admin_send_message',{p_user:id,p_title:t,p_body:b},'أُرسلت الرسالة'))openUser(id)}
+async function doDel(id,em){if(prompt('اكتب DELETE لتأكيد حذف الحساب نهائيًا: '+em)!=='DELETE')return;if(await act('admin_delete_user',{p_user:id},'حُذف الحساب')){closeDr();load(true)}}
+
+/* ===== moderation ===== */
+async function vMod(){
+  const m=await rpc('admin_moderation');
+  const open=m.reports.filter(r=>!['done','closed','resolved','handled'].includes((r.status||'').toLowerCase())).length;
+  const nb=open+m.forum_reports.filter(f=>!f.hidden).length;$('#mb').textContent=nb;$('#mb').classList.toggle('hide',!nb);
+  const sts=[...new Set(['new','done',...m.reports.map(r=>r.status).filter(Boolean)])];
+  $('#v-mod').innerHTML=`<div class="grid mod2">
+   <div class="card"><h3>📩 رسائل وبلاغات الدعم (${m.reports.length})</h3>${m.reports.length?m.reports.map(r=>`<div class="mini"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="pill p-y">${esc(r.kind)}</span><a class="who" onclick="openUser('${r.user_id}')">${esc(r.name||r.email||'—')}</a><small style="margin-right:auto">${ago(r.created_at)}</small></div><p style="margin:7px 0">${esc(r.message)}</p>
+     <div class="row" style="margin:6px 0 0"><select style="width:auto;padding:5px 10px" onchange="setRep(${r.id},this.value)">${sts.map(s=>`<option ${s===r.status?'selected':''}>${esc(s)}</option>`).join('')}</select><button class="btn sm red" onclick="delRep(${r.id})">حذف</button></div></div>`).join(''):'<div class="empty">لا بلاغات 🎉</div>'}</div>
+   <div class="card"><h3>🚩 بلاغات المنتدى (${m.forum_reports.length})</h3>${m.forum_reports.length?m.forum_reports.map(f=>`<div class="mini"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="pill p-r">${esc(f.kind)}</span>${f.hidden?'<span class="pill p-m">مخفي</span>':''}<small style="margin-right:auto">${ago(f.created_at)}</small></div>
+     <p style="margin:7px 0">${esc(f.preview||'(المحتوى محذوف)')}</p><small>السبب: ${esc(f.reason||'—')} · المُبلِّغ: ${esc(f.reporter||'—')}</small>
+     <div class="row" style="margin:8px 0 0"><button class="btn sm" onclick="hideF('${esc(f.kind)}','${f.target}',${!f.hidden})">${f.hidden?'إظهار':'إخفاء'}</button>${f.author?`<button class="btn sm" onclick="openUser('${f.author}')">صاحب المحتوى</button>`:''}</div></div>`).join(''):'<div class="empty">لا بلاغات 🎉</div>'}</div></div>
+   <div class="card" style="margin-top:16px"><h3>🙈 محتوى مخفي (${m.hidden_posts.length+m.hidden_comments.length})</h3>
+    ${[...m.hidden_posts.map(x=>['post',x]),...m.hidden_comments.map(x=>['comment',x])].map(([k,x])=>`<div class="mini"><span class="pill p-m">${k==='post'?'منشور':'تعليق'}</span> ${esc(x.body)}<div class="row" style="margin:6px 0 0"><button class="btn sm" onclick="hideF('${k}','${x.id}',false)">إظهار</button><button class="btn sm" onclick="openUser('${x.user_id}')">صاحبه</button></div></div>`).join('')||'<div class="empty">لا شيء</div>'}</div>`;
+}
+async function setRep(id,s){await act('admin_set_report',{p_id:id,p_status:s},'تم التحديث')}
+async function delRep(id){if(confirm('حذف البلاغ؟')&&await act('admin_delete_report',{p_id:id},'تم الحذف'))vMod()}
+async function hideF(kind,id,hide){if(await act('forum_mod_hide',{p_kind:kind,p_id:id,p_hide:hide},hide?'تم الإخفاء':'تم الإظهار'))vMod()}
+
+/* ===== log ===== */
+async function vLog(){
+  const l=await rpc('admin_logs',{p_limit:200});
+  $('#v-log').innerHTML=l.length?`<div class="tw"><table><thead><tr><th>الوقت</th><th>الأدمن</th><th>الإجراء</th><th>الهدف</th><th>تفاصيل</th></tr></thead><tbody>${l.map(x=>`<tr><td style="white-space:nowrap">${full(x.created_at)}</td><td>${esc(x.admin_email||'—')}</td><td><span class="pill p-y">${esc(x.action)}</span></td><td>${esc(x.target_email||x.target||'—')}</td><td style="color:var(--mut)">${esc(x.details||'')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">السجل فارغ</div>';
+}
+
+/* ===== polling ===== */
+let pt;
+function startPoll(){stopPoll();pt=setInterval(()=>{if(document.hidden)return;if(tab==='live'||tab==='mod')load(false)},6000)}
+function stopPoll(){clearInterval(pt)}
+sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_OUT'&&!$('#app').classList.contains('hide'))location.reload()});
+boot();
+</script>
+</body>
+</html>
