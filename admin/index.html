@@ -142,6 +142,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
     <button class="nav" data-t="live"><i>⚡</i>البث المباشر</button>
     <button class="nav" data-t="users"><i>👥</i>المستخدمون</button>
     <button class="nav" data-t="push"><i>📣</i>الإشعارات</button>
+    <button class="nav" data-t="lib"><i>📚</i>المكتبة</button>
     <button class="nav" data-t="mod"><i>🛡</i>الرقابة<span class="bd hide" id="mb"></span></button>
     <button class="nav" data-t="log"><i>📜</i>سجل الإدارة</button>
     <div class="side-foot"><div id="me" style="word-break:break-all;margin-bottom:8px"></div><button class="btn sm" id="out">تسجيل الخروج</button></div>
@@ -154,6 +155,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
     <section id="v-live" class="hide"></section>
     <section id="v-users" class="hide"></section>
     <section id="v-push" class="hide"></section>
+    <section id="v-lib" class="hide"></section>
     <section id="v-mod" class="hide"></section>
     <section id="v-log" class="hide"></section>
   </main>
@@ -168,7 +170,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefr
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=n=>Number(n||0).toLocaleString('en-US');
-const TITLES={push:'إرسال إشعار',ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة'};
+const TITLES={lib:'المكتبة ورفع الكتب',push:'إرسال إشعار',ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة'};
 const EV={
  signup:['👤','تسجيل جديد','var(--gr)'],login:['🔑','دخول','var(--cy)'],post:['💬','منشور بالمنتدى','var(--vi)'],comment:['↩️','تعليق','var(--vi)'],
  forum_report:['🚩','بلاغ منتدى','var(--rd)'],report:['📩','رسالة/بلاغ للدعم','var(--or)'],admin:['🛠','إجراء إداري','var(--gold)'],broadcast:['📣','إشعار جماعي','var(--gold)'],
@@ -209,10 +211,10 @@ document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.t));
 $('#rf').onclick=()=>load(true);
 function go(t){tab=t;try{localStorage.setItem('tab',t)}catch(_){}
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  ['ov','live','users','push','mod','log'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
+  ['ov','live','users','push','lib','mod','log'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
   $('#ttl').textContent=TITLES[t];window.scrollTo(0,0);load(false)}
 async function load(force){
-  try{({ov:vOverview,live:vLive,users:vUsers,push:vPush,mod:vMod,log:vLog})[tab](force);setLive(true)}catch(e){setLive(false)}}
+  try{({ov:vOverview,live:vLive,users:vUsers,push:vPush,lib:vLib,mod:vMod,log:vLog})[tab](force);setLive(true)}catch(e){setLive(false)}}
 function setLive(ok){$('#dot').classList.toggle('off',!ok);$('#lt').textContent=ok?'متصل':'انقطع الاتصال'}
 
 /* ===== overview ===== */
@@ -333,13 +335,21 @@ async function vPush(){
      <div class="row" style="margin-top:0"><div style="flex:1;min-width:200px"><label style="color:var(--mut);font-size:13px">المستلمون</label><select id="pg"><option value="">كل المستخدمين</option>${grades.map(g=>`<option value="${esc(g)}">${esc(GR[g]||g)}</option>`).join('')}</select></div></div>
      <input id="pt" placeholder="عنوان الإشعار" maxlength="80" style="margin-bottom:10px">
      <textarea id="pb" rows="4" placeholder="نص الإشعار" maxlength="300" style="margin-bottom:10px"></textarea>
-     <input id="pi" placeholder="رابط صورة (اختياري، https)" style="direction:ltr;margin-bottom:12px">
+     <div class="row" style="margin:0 0 12px"><input id="pi" placeholder="رابط صورة (اختياري، https)" style="direction:ltr;flex:1;min-width:180px"><button class="btn" id="pu" type="button">🖼 اختر من المعرض</button><input id="pf" type="file" accept="image/*" class="hide"></div>
+     <img id="pp" class="hide" style="max-width:100%;border-radius:14px;margin-bottom:12px">
      <div class="row" style="margin:0"><button class="btn pri" id="ps">🚀 إرسال الآن</button><span id="pr" style="color:var(--mut);align-self:center;font-size:13px"></span></div>
      <p style="color:var(--mut);font-size:12.5px;margin-top:12px;line-height:1.7">يصل للهاتف حتى لو التطبيق مغلق والشاشة مقفلة (عبر Firebase)، بشرط أن يكون الطالب فتح التطبيق وسمح بالإشعارات مرة واحدة.</p></div>
      <div class="card"><h3>👀 معاينة</h3><div class="ev" style="--c:var(--gold)"><div class="ic">م</div><div class="bd"><div class="h"><b>معلّمي</b><span class="tm">الآن</span></div><p><b id="vt">العنوان</b><br><span id="vb">النص يظهر هنا</span></p></div></div>
      <h3 style="margin-top:22px">🕘 آخر الإشعارات المرسلة</h3><div id="ph"></div></div></div>`;
     const upd=()=>{$('#vt').textContent=$('#pt').value||'العنوان';$('#vb').textContent=$('#pb').value||'النص يظهر هنا'};
     $('#pt').oninput=upd;$('#pb').oninput=upd;
+    $('#pu').onclick=()=>$('#pf').click();
+    $('#pf').onchange=async()=>{const f=$('#pf').files[0];if(!f)return;$('#pu').disabled=true;$('#pr').textContent='جارٍ رفع الصورة…';
+      try{const blob=await shrink(f,1200);const path='push/'+Date.now()+'.jpg';
+        const {error}=await sb.storage.from('notif').upload(path,blob,{contentType:'image/jpeg'});if(error)throw error;
+        const url=sb.storage.from('notif').getPublicUrl(path).data.publicUrl;$('#pi').value=url;$('#pp').src=url;$('#pp').classList.remove('hide');$('#pr').textContent='✓ تم رفع الصورة'}
+      catch(e){$('#pr').textContent='';toast('فشل رفع الصورة: '+(e.message||e))}
+      $('#pu').disabled=false;$('#pf').value=''};
     $('#ps').onclick=async()=>{
       const title=$('#pt').value.trim(),body=$('#pb').value.trim(),grade=$('#pg').value,image=$('#pi').value.trim();
       if(!title||!body)return toast('اكتب العنوان والنص');
@@ -351,7 +361,7 @@ async function vPush(){
       $('#ps').disabled=false;
       if(error){let m=error.message;try{m=await error.context.text()}catch(_){}$('#pr').textContent='';toast('فشل: '+m.slice(0,160));return}
       $('#pr').textContent='✓ '+(typeof data==='string'?data:JSON.stringify(data)).slice(0,120);toast('تم الإرسال');
-      $('#pt').value='';$('#pb').value='';$('#pi').value='';upd();loadHist();
+      $('#pt').value='';$('#pb').value='';$('#pi').value='';$('#pp').classList.add('hide');upd();loadHist();
     };
   }
   loadHist();
@@ -359,6 +369,58 @@ async function vPush(){
 async function loadHist(){
   const {data}=await sb.from('notifications').select('title,body,target_grade,created_at').order('created_at',{ascending:false}).limit(12);
   $('#ph').innerHTML=(data&&data.length)?data.map(n=>`<div class="mini"><b>${esc(n.title)}</b> <span class="pill p-m">${esc(n.target_grade?(GR[n.target_grade]||n.target_grade):'الكل')}</span><br>${esc(n.body)}<small>${full(n.created_at)}</small></div>`).join(''):'<div class="empty">لا شيء بعد</div>'}
+
+function shrink(file,max){return new Promise((ok,no)=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);c.toBlob(b=>b?ok(b):no(new Error('تعذر معالجة الصورة')),'image/jpeg',.86)};im.onerror=()=>no(new Error('ملف صورة غير صالح'));im.src=URL.createObjectURL(file)})}
+
+/* ===== library / bulk books ===== */
+let libQ=[],libInfo={grades:[],tracks:[],kinds:[],subjects:[]};
+const cleanTitle=n=>n.replace(/\.pdf$/i,'').replace(/[_]+/g,' ').replace(/\s+/g,' ').trim();
+async function vLib(){
+  const {data:books,error}=await sb.from('books').select('id,title,grade,track,kind,subject,file_url,published,created_at').order('created_at',{ascending:false}).limit(1000);
+  if(error)throw error;
+  let gs=[];try{gs=Object.keys((await rpc('admin_overview')).by_grade||{}).filter(g=>g!=='؟')}catch(_){}
+  const u=a=>[...new Set(a.filter(Boolean))];
+  libInfo={grades:u([...gs,...books.map(b=>b.grade)]),tracks:u(books.map(b=>b.track)),kinds:u(books.map(b=>b.kind)),subjects:u(books.map(b=>b.subject))};
+  const by={};books.forEach(b=>{const k=(GR[b.grade]||b.grade||'؟')+(b.track?' · '+b.track:'');(by[k]=by[k]||[]).push(b)});
+  const dl=(id,a)=>`<datalist id="${id}">${a.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`;
+  $('#v-lib').innerHTML=`${dl('dg',libInfo.grades)}${dl('dt',libInfo.tracks)}${dl('dk',libInfo.kinds)}${dl('ds',libInfo.subjects)}
+  <div class="card"><h3>⬆️ رفع كتب دفعة واحدة</h3>
+   <p style="color:var(--mut);font-size:13.5px;line-height:1.8;margin-bottom:12px">اختر ملفات PDF كثيرة مرة واحدة (مثلًا كل كتب صف معيّن)، حدّد الصف والنوع للكل، واكتب المادة لكل كتاب، ثم «رفع الكل». ارفع كتبًا يحقّ لك توزيعها فقط.</p>
+   <div class="row" style="margin-top:0">
+    <div style="flex:1;min-width:150px"><small style="color:var(--mut)">الصف (للكل)</small><input id="lg" list="dg" placeholder="مثال: ${esc(libInfo.grades[0]||'')}"></div>
+    <div style="flex:1;min-width:150px"><small style="color:var(--mut)">المسار (اختياري)</small><input id="lt" list="dt"></div>
+    <div style="flex:1;min-width:150px"><small style="color:var(--mut)">النوع</small><input id="lk" list="dk" value="${esc(libInfo.kinds[0]||'')}"></div></div>
+   <div class="row"><button class="btn" id="lp" type="button">📁 اختر ملفات PDF</button><input id="lfile" type="file" accept="application/pdf" multiple class="hide"><label style="display:flex;gap:7px;align-items:center"><input type="checkbox" id="lpub" checked style="width:auto"> نشر مباشرة</label></div>
+   <div id="lq"></div><div class="row"><button class="btn pri hide" id="ls" type="button">🚀 رفع الكل</button><span id="lr" style="color:var(--mut);align-self:center"></span></div></div>
+  <div class="card" style="margin-top:16px"><h3>📖 الكتب الموجودة (${books.length})</h3>
+   ${Object.entries(by).map(([k,a])=>`<details style="margin-bottom:8px"><summary style="cursor:pointer;padding:8px 2px"><b>${esc(k)}</b> <span class="pill p-v">${a.length}</span></summary>${a.map(b=>`<div class="mini" style="display:flex;gap:10px;align-items:center"><span style="flex:1">${esc(b.title)}<small>${esc(b.subject||'')} ${b.kind?'· '+esc(b.kind):''} ${b.published?'':'· غير منشور'}</small></span><button class="btn sm red" onclick="delBook('${b.id}','${esc(b.file_url||'')}')">حذف</button></div>`).join('')}</details>`).join('')||'<div class="empty">لا كتب بعد</div>'}</div>`;
+  libQ=[];
+  $('#lp').onclick=()=>$('#lfile').click();
+  $('#lfile').onchange=()=>{[...$('#lfile').files].forEach(f=>libQ.push({f,title:cleanTitle(f.name),subject:'',st:''}));$('#lfile').value='';renderLQ()};
+  $('#ls').onclick=libUpload;
+}
+function renderLQ(){
+  $('#lq').innerHTML=libQ.map((q,i)=>`<div class="mini" style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center"><input value="${esc(q.title)}" oninput="libQ[${i}].title=this.value" placeholder="عنوان الكتاب"><input list="ds" value="${esc(q.subject)}" oninput="libQ[${i}].subject=this.value" placeholder="المادة"><span id="st${i}" style="min-width:60px">${q.st||(q.f.size/1048576).toFixed(1)+'MB'}</span></div>`).join('');
+  $('#ls').classList.toggle('hide',!libQ.length)}
+async function libUpload(){
+  const grade=$('#lg').value.trim(),track=$('#lt').value.trim(),kind=$('#lk').value.trim(),pub=$('#lpub').checked;
+  if(!grade)return toast('اكتب الصف');if(!libQ.length)return;
+  if(libQ.some(q=>!q.subject.trim()||!q.title.trim()))return toast('اكتب العنوان والمادة لكل كتاب');
+  if(!confirm('رفع '+libQ.filter(q=>q.st!=='✓').length+' كتاب إلى الصف: '+(GR[grade]||grade)+'؟'))return;
+  $('#ls').disabled=true;let ok=0,bad=0;
+  for(let i=0;i<libQ.length;i++){const q=libQ[i];if(q.st==='✓'){ok++;continue}
+    const set=t=>{q.st=t;const e=$('#st'+i);if(e)e.textContent=t};set('⏳');$('#lr').textContent=`(${i+1}/${libQ.length})`;
+    try{const path='bulk/'+Date.now()+'-'+i+'.pdf';
+      const up=await sb.storage.from('books').upload(path,q.f,{contentType:'application/pdf'});if(up.error)throw up.error;
+      const url=sb.storage.from('books').getPublicUrl(path).data.publicUrl;
+      const row={title:q.title.trim(),grade,subject:q.subject.trim(),file_url:url,published:pub};if(track)row.track=track;if(kind)row.kind=kind;
+      const ins=await sb.from('books').insert(row);if(ins.error){await sb.storage.from('books').remove([path]);throw ins.error}
+      set('✓');ok++}catch(e){set('✗');bad++;toast('فشل «'+q.title.slice(0,25)+'»: '+(e.message||e))}}
+  $('#ls').disabled=false;$('#lr').textContent=`تم: ${ok} · فشل: ${bad}`;if(!bad){toast('تم رفع كل الكتب');setTimeout(vLib,1200)}
+}
+async function delBook(id,url){if(!confirm('حذف هذا الكتاب؟'))return;
+  const {error}=await sb.from('books').delete().eq('id',id);if(error)return toast('فشل: '+error.message);
+  const m=url.match(/\/object\/public\/books\/(.+)$/);if(m)await sb.storage.from('books').remove([decodeURIComponent(m[1])]);toast('تم الحذف');vLib()}
 
 /* ===== moderation ===== */
 async function vMod(){
