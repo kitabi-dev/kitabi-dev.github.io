@@ -231,7 +231,7 @@ footer a:hover{color:var(--tx)}
 const CFG={
   repo:"Kitabi-dev/kitabi-dev.github.io",          // مستودع الموقع (فيه الـ Releases)
   apkName:"moalemi.apk",                           // اسم ملف الـ APK في الـ Release (ثابت دائمًا)
-  apkpure:"",                                      // ضع رابط التطبيق على APKPure هنا (اختياري)
+  apkpure:"https://apkpure.com/p/com.moalemi.moalemi",                                      // ضع رابط التطبيق على APKPure هنا (اختياري)
   version:"1.0.0", size:"حوالي 59 ميغابايت"
 };
 const dlUrl=`https://github.com/${CFG.repo}/releases/latest/download/${CFG.apkName}`;
@@ -241,7 +241,7 @@ const ua=navigator.userAgent||'';
 if(!/Android/i.test(ua)){document.getElementById('note').textContent='💡 افتح هذه الصفحة من هاتف أندرويد لتثبيت التطبيق.'}
 (async()=>{try{
   const r=await fetch(`https://api.github.com/repos/${CFG.repo}/releases/latest`);if(!r.ok)return;const j=await r.json();
-  const a=(j.assets||[]).find(x=>x.name===CFG.apkName);
+  const a=(j.assets||[]).find(x=>/\.apk$/i.test(x.name));if(a){document.querySelectorAll('a.dl').forEach(l=>l.href=a.browser_download_url)}
   if(j.tag_name)document.getElementById('ver').textContent='الإصدار '+j.tag_name.replace(/^v/i,'');
   if(a&&a.size)document.getElementById('size').textContent=Math.round(a.size/1048576)+' ميغابايت';
 }catch(_){}})();
