@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="google-site-verification" content="MvE2hmtHvRJYnso9OUuovxEL_J5MDiy7t35B_LH4efs" />
 <title>معلّمي — منهجك الليبي ومعلّمك الذكي في جيبك</title>
-<meta name="description" content="معلّمي: تطبيق تعليمي مجاني للمنهج الليبي من الصف الأول الابتدائي حتى الثالث الثانوي. كتب وملازم وفيديوهات وأسئلة ومعلّم ذكي يشرح لك كل درس.">
+<meta name="description" content="معلّمي: تطبيق تعليمي مجاني للمنهج الليبي من الصف الأول الابتدائي حتى الثالث الثانوي. كتب وملازم وفيديوهات وأسئلة ومعلّم ذكي تكلّمه بصوتك ويشرح لك كل درس.">
 <meta name="theme-color" content="#05060d">
 <meta property="og:type" content="website">
 <meta property="og:title" content="معلّمي — منهجك الليبي ومعلّمك الذكي في جيبك">
@@ -88,6 +88,21 @@ h2{font-size:clamp(30px,4.4vw,46px);font-weight:900;line-height:1.25;margin-bott
 .st{padding:28px;border-radius:26px;background:var(--card);border:1px solid var(--line);position:relative}
 .st:before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:14px;margin-bottom:16px;font-weight:900;font-size:21px;color:#1a1405;background:linear-gradient(135deg,#ffe9a8,var(--gold))}
 .st h3{font-size:20px;margin-bottom:6px}.st p{color:var(--mut);font-size:15.5px}
+/* install warn */
+.steps{grid-template-columns:repeat(4,1fr)}
+.warn{margin-top:26px;padding:26px;border-radius:26px;border:1px solid rgba(245,196,81,.35);background:linear-gradient(160deg,rgba(245,196,81,.08),rgba(255,255,255,.02))}
+.warn-t{font-weight:900;font-size:20px;margin-bottom:18px;color:var(--gold)}
+.warn-g{display:grid;grid-template-columns:.8fr 1.2fr;gap:22px;align-items:start}
+.mock{background:#10131f;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.mk-h{font-weight:800;margin-bottom:8px}
+.mock p{color:var(--mut);font-size:14.5px;margin-bottom:12px}
+.mk-b{display:flex;justify-content:space-between;gap:8px;margin-top:8px}
+.mk-b span{flex:1;text-align:center;padding:9px 8px;border-radius:12px;font-size:14px;font-weight:700;background:rgba(255,255,255,.06);color:var(--mut)}
+.mk-b span.hot{background:rgba(10,132,255,.22);color:#fff;border:1px solid var(--blue)}
+.warn-x p{color:var(--mut);font-size:15.5px;margin-bottom:10px}
+.warn-x b{color:var(--tx)}
+.warn-x a{color:var(--cy);text-decoration:underline}
+.warn-n{font-size:13.5px!important;opacity:.85}
 /* faq */
 details{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:0 22px;margin-bottom:12px;transition:.2s}
 details[open]{border-color:rgba(10,132,255,.5);background:#0d1128}
@@ -114,6 +129,7 @@ footer a:hover{color:var(--tx)}
  .lead{margin-inline:auto}.cta,.meta{justify-content:center}
  .stats{grid-template-columns:repeat(2,1fr)}
  .grid,.steps{grid-template-columns:1fr}
+ .warn-g{grid-template-columns:1fr}
  .c1{right:-4%}.c2{left:-4%}
  section{padding:60px 0}
 }
@@ -134,19 +150,19 @@ footer a:hover{color:var(--tx)}
   <div>
     <div class="badge">🇱🇾 المنهج الليبي · من الأول ابتدائي إلى ثالثة ثانوي</div>
     <h1>منهجك كله <span class="blue">في جيبك</span>،<br>ومعلّمك <span class="gold">الذكي</span> معاك</h1>
-    <p class="lead">كتب وملازم وفيديوهات وأسئلة تحلها، ومعلّم ذكي يشرحلك أي درس بالبساطة. كل اللي تحتاجه للدراسة في تطبيق واحد.</p>
+    <p class="lead">كتب تنزّلها وتقراها بدون إنترنت، وأسئلة تختبر بيها نفسك، ومعلّم ذكي تتكلم معاه بصوتك ويشرحلك أي درس بالبساطة. كل اللي تحتاجه للدراسة في تطبيق واحد.</p>
     <div class="cta">
       <a class="btn pri big dl" href="#" rel="noopener">⬇ حمّل التطبيق مجانًا</a>
       <a class="btn ghost big dl2 hidden" href="#" rel="noopener" style="display:none">APKPure</a>
       <a class="btn ghost big" href="#features">اكتشف المزايا</a>
     </div>
-    <div class="meta"><span>🤖 أندرويد</span><span id="ver">الإصدار 1.0.0</span><span id="size">حوالي 59 ميغابايت</span><span>✓ مجاني</span></div>
+    <div class="meta"><span>🤖 أندرويد</span><span id="ver">الإصدار 1.1.0</span><span id="size">حوالي 74 ميغابايت</span><span>✓ مجاني</span></div>
     <div class="note" id="note"></div>
   </div>
   <div class="phone rv">
     <img src="img/lp-s1.jpg" alt="الشاشة الرئيسية في تطبيق معلّمي" width="720" height="1280" fetchpriority="high">
-    <div class="chip c1">✨ معلّم AI يشرح لك</div>
-    <div class="chip c2">📚 كل الكتب بمكان واحد</div>
+    <div class="chip c1">🎙 كلّم المعلّم بصوتك</div>
+    <div class="chip c2">📚 اقرأ بدون إنترنت</div>
   </div>
 </div>
 
@@ -166,10 +182,13 @@ footer a:hover{color:var(--tx)}
   <div class="grid">
     <div class="f rv" style="--c:#FF9500"><i>📚</i><h3>المكتبة</h3><p>كتب المنهج وملازم وأوراق عمل وأدلة المعلّم مرتبة حسب صفك ومادتك، وتقرأها بالعرض صفحة صفحة.</p></div>
     <div class="f rv" style="--c:#AF52DE"><i>✨</i><h3>معلّم AI</h3><p>اسأله عن أي درس وهو يشرحلك بخطوات بسيطة وأمثلة، وبلهجة قريبة منك.</p></div>
-    <div class="f rv" style="--c:#00C7BE"><i>❓</i><h3>أسئلة تحلها</h3><p>أسئلة اختيار من متعدد وأسئلة مقالية على كل مادة، وتعرف إجابتك صح ولا غلط في الحال.</p></div>
+    <div class="f rv" style="--c:#00C7BE"><i>❓</i><h3>أسئلة تحلها</h3><p>اختبر نفسك بأسئلة اختيار من متعدد وتعرف إجابتك صح ولا غلط في الحال، ولو غلطت اضغط «اشرح لي» ويشرحلك المعلّم السؤال.</p></div>
     <div class="f rv" style="--c:#FF3B30"><i>▶️</i><h3>فيديوهات الشرح</h3><p>شروحات مصوّرة للدروس تقدر تشوفها وقت ما تحب وتعيدها كم مرة تبي.</p></div>
     <div class="f rv" style="--c:#34C759"><i>💬</i><h3>المنتدى</h3><p>اسأل واستفسر وشارك زملاءك، وتوصلك إشعارات برد كل واحد على سؤالك.</p></div>
     <div class="f rv" style="--c:#5856D6"><i>✅</i><h3>دراستي</h3><p>نظّم جدولك الدراسي ومهامك وملاحظاتك، وتابع تقدمك في كل مادة.</p></div>
+    <div class="f rv" style="--c:#FF2D78"><i>🎙</i><h3>معلّم يتكلم</h3><p>تحدّث مع المعلّم الذكي بصوتك وهو يردّ عليك بالصوت، كأنك في حصة خاصة. وتقدر تقوله «كرر» أو «أبطأ» أو «توقف».</p></div>
+    <div class="f rv" style="--c:#30B0C7"><i>⬇️</i><h3>اقرأ بدون إنترنت</h3><p>نزّل الكتب على هاتفك من «تحميلاتي»، وكمّل من آخر صفحة وصلت لها من الشاشة الرئيسية.</p></div>
+    <div class="f rv" style="--c:#FFCC00"><i>🔔</i><h3>إشعارات</h3><p>توصلك رسائل الإدارة وردود المنتدى، وتفتح الرسالة كاملة بضغطة واحدة.</p></div>
   </div>
 </div></section>
 
@@ -189,12 +208,31 @@ footer a:hover{color:var(--tx)}
 
 <section id="install"><div class="wrap">
   <div class="eyebrow">التثبيت</div>
-  <h2>جاهز في <span class="gold">3 خطوات</span></h2>
-  <p class="sub">التطبيق يُثبَّت كملف APK على أندرويد. ما يستغرق دقيقة.</p>
+  <h2>جاهز في <span class="gold">4 خطوات</span></h2>
+  <p class="sub">التطبيق لأندرويد ويُثبَّت من الموقع مباشرة. ما يستغرق دقيقة، ولو ظهرت لك رسالة من جوجل فهذا طبيعي، وشرحناها تحت.</p>
   <div class="steps">
-    <div class="st rv"><h3>حمّل الملف</h3><p>اضغط زر «حمّل التطبيق» وانتظر لين ينزل ملف <b>moalemi.apk</b> على هاتفك.</p></div>
-    <div class="st rv"><h3>اسمح بالتثبيت</h3><p>افتح الملف، ولو طلب منك الهاتف السماح بالتثبيت من هذا المصدر فوافق (مرة وحدة فقط).</p></div>
+    <div class="st rv"><h3>حمّل الملف</h3><p>اضغط «حمّل التطبيق» وانتظر لين ينزل ملف <b>moalemi.apk</b>.</p></div>
+    <div class="st rv"><h3>افتح الملف</h3><p>افتحه من إشعار التحميل أو من تطبيق «الملفات». لو طلب الهاتف السماح بالتثبيت من هذا المصدر فوافق (مرة وحدة فقط).</p></div>
+    <div class="st rv"><h3>لو ظهرت رسالة جوجل</h3><p>اضغط <b>«تفاصيل أكثر»</b> ثم <b>«التثبيت على أي حال»</b>.</p></div>
     <div class="st rv"><h3>افتح وسجّل</h3><p>افتح معلّمي، أنشئ حسابك أو ادخل بحساب جوجل، واختر صفك وابدأ.</p></div>
+  </div>
+
+  <div class="warn rv">
+    <div class="warn-t">🛡 ظهرت لك رسالة «<bdi dir="ltr">Google Play Protect</bdi>»؟ هذا طبيعي</div>
+    <div class="warn-g">
+      <div class="mock">
+        <div class="mk-h">🛡 Google Play Protect</div>
+        <p>تطبيق من مطوّر غير معروف. يمكنك فحصه قبل التثبيت.</p>
+        <div class="mk-b"><span class="hot">تفاصيل أكثر ←</span><span>افحص التطبيق</span></div>
+        <div class="mk-b"><span class="hot">التثبيت على أي حال</span><span>إلغاء</span></div>
+      </div>
+      <div class="warn-x">
+        <p><b>ليش تظهر؟</b> لأن معلّمي تطبيق جديد من مطوّر مستقل، وغير منشور بعد على متجر Google Play. جوجل تعرض هذا التنبيه لأي تطبيق يُثبَّت من خارج المتجر ولم تفحصه بعد، وهو تنبيه عام وليس معناه أن التطبيق فيه ضرر.</p>
+        <p><b>شو تعمل؟</b> اضغط «تفاصيل أكثر» ثم «التثبيت على أي حال». وتقدر تضغط «افحص التطبيق» فترسله جوجل للفحص.</p>
+        <p><b>أذونات التطبيق:</b> الإنترنت، والإشعارات، والميكروفون (فقط عند استخدام المعلّم الصوتي). اقرأ <a href="privacy.html">سياسة الخصوصية</a>.</p>
+        <p class="warn-n">صياغة الرسالة تختلف قليلًا من هاتف لهاتف، لكن الخيار دايمًا في «تفاصيل أكثر».</p>
+      </div>
+    </div>
   </div>
 </div></section>
 
@@ -204,7 +242,10 @@ footer a:hover{color:var(--tx)}
   <p class="sub">أجبنا على أكثر الأسئلة تكرارًا.</p>
   <details class="rv"><summary>هل التطبيق مجاني؟</summary><p>نعم، التطبيق مجاني للطلاب.</p></details>
   <details class="rv"><summary>لأي صفوف هو؟</summary><p>للمنهج الليبي من الصف الأول الابتدائي إلى الصف الثالث الثانوي، والمحتوى يتحدّث باستمرار.</p></details>
-  <details class="rv"><summary>هل أحتاج إنترنت؟</summary><p>نعم، حاليًا تحتاج اتصالًا بالإنترنت لقراءة الكتب وتشغيل الفيديوهات واستخدام المعلّم الذكي.</p></details>
+  <details class="rv"><summary>ظهرت لي رسالة من جوجل عند التثبيت، هل التطبيق آمن؟</summary><p>هذه رسالة Google Play Protect، وتظهر لأي تطبيق جديد يُثبَّت من خارج متجر جوجل. اضغط «تفاصيل أكثر» ثم «التثبيت على أي حال». شرحنا الخطوات <a href="#install">فوق</a>، وتقدر تراجع <a href="privacy.html">سياسة الخصوصية</a> لتعرف ما يطلبه التطبيق.</p></details>
+  <details class="rv"><summary>هل أحتاج إنترنت؟</summary><p>للمعلّم الذكي والفيديوهات والمنتدى نعم. أما الكتب فتقدر تنزّلها على هاتفك من «تحميلاتي» وتقراها بدون إنترنت.</p></details>
+  <details class="rv"><summary>هل المعلّم الذكي يتكلم؟</summary><p>نعم. اضغط زر الميكروفون في صفحة المعلّم وتكلم معاه بصوتك، وهو يردّ عليك بالصوت. تقدر تضبط سرعة القراءة والرد الصوتي من إعدادات الصفحة.</p></details>
+  <details class="rv"><summary>كيف أحدّث التطبيق؟</summary><p>حمّل آخر نسخة من هذه الصفحة وثبّتها فوق القديمة، وحسابك وبياناتك تبقى كما هي.</p></details>
   <details class="rv"><summary>كم رسالة أقدر أرسل للمعلّم الذكي؟</summary><p>لكل طالب عدد محدد من الرسائل يوميًا حتى يبقى الخدمة متاحة للجميع، ويتجدد كل يوم.</p></details>
   <details class="rv"><summary>هل بياناتي محفوظة بأمان؟</summary><p>نحرص على خصوصية الطلاب ولا نطلب بيانات غير ضرورية. اقرأ <a href="privacy.html">سياسة الخصوصية</a> و<a href="terms.html">شروط الاستخدام</a>.</p></details>
   <details class="rv"><summary>كيف أحذف حسابي؟</summary><p>تقدر تحذف حسابك وبياناتك من داخل التطبيق (حسابي ← حذف الحساب)، أو من <a href="delete-account.html">صفحة حذف الحساب</a>.</p></details>
@@ -232,7 +273,7 @@ const CFG={
   repo:"Kitabi-dev/kitabi-dev.github.io",          // مستودع الموقع (فيه الـ Releases)
   apkName:"moalemi.apk",                           // اسم ملف الـ APK في الـ Release (ثابت دائمًا)
   apkpure:"https://apkpure.com/p/com.moalemi.moalemi",                                      // ضع رابط التطبيق على APKPure هنا (اختياري)
-  version:"1.0.0", size:"حوالي 59 ميغابايت"
+  version:"1.1.0", size:"حوالي 74 ميغابايت"
 };
 const dlUrl=`https://github.com/${CFG.repo}/releases/latest/download/${CFG.apkName}`;
 document.querySelectorAll('a.dl').forEach(a=>{a.href=dlUrl;a.setAttribute('download','')});
