@@ -482,7 +482,17 @@ async function vSettings(){
     <div class="fr"><div><b>المنتدى</b><small>إيقافه يخفي المنتدى عن الجميع</small></div>${sw('s_fo',on('forum_enabled',true))}</div>
     <label class="lb2">بريد الدعم</label><input id="s_se" type="email" maxlength="120" value="${esc(SET.support_email||'')}" placeholder="support@example.com" style="direction:ltr">
     <div style="margin-top:14px"><button class="btn pri" id="sv3">حفظ</button></div></div>
+
+  <div class="card"><h3>🔊 القراءة بالصوت</h3>
+    <div class="fr"><div><b>تشغيل القراءة بالصوت المدمج</b><small>إيقافها يحوّل الطلاب لصوت هواتفهم</small></div>${sw('s_tt',on('tts_enabled',true))}</div>
+    <label class="lb2">الحد اليومي لكل طالب (مقاطع صوتية، الافتراضي 400)</label><input id="s_tdl" type="number" min="0" max="999999" inputmode="numeric" value="${esc(SET.tts_daily_limit||'')}" placeholder="400">
+    <label class="lb2">الحد اليومي لكل الطلاب معًا (الافتراضي 20000)</label><input id="s_tgl" type="number" min="0" max="999999" inputmode="numeric" value="${esc(SET.tts_global_limit||'')}" placeholder="20000">
+    <div style="margin-top:14px"><button class="btn pri" id="sv4">حفظ</button></div></div>
   </div>`;
+  $('#sv4').onclick=async()=>{
+    const d=$('#s_tdl').value.trim(),g=$('#s_tgl').value.trim();
+    if((d&&!/^\d{1,6}$/.test(d))||(g&&!/^\d{1,6}$/.test(g))){toast('أدخل أرقامًا صحيحة فقط');return}
+    try{await setK('tts_enabled',$('#s_tt').checked?'1':'0');if(d)await setK('tts_daily_limit',d);if(g)await setK('tts_global_limit',g);toast('تم الحفظ')}catch(e){toast('فشل: '+e.message)}};
   $('#sv1').onclick=async()=>{
     const want=$('#s_mt').checked,was=on('maintenance',false);
     if(want&&!was&&!confirm('تفعيل الصيانة سيمنع الطلاب من استخدام التطبيق. متأكد؟'))return;
