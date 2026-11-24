@@ -77,6 +77,14 @@ main{padding:24px 28px 60px;min-width:0}
 .sw input:checked+span{background:var(--gold);border-color:var(--gold)}
 .sw input:checked+span:before{background:#1a1405;transform:translateX(-20px)}
 .lb2{display:block;color:var(--mut);font-size:13px;margin:12px 0 6px}
+#mp{height:380px;border-radius:16px;overflow:hidden;border:1px solid var(--line);direction:ltr;background:var(--bg2)}
+#mp .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.6)}
+#mp .leaflet-popup-content-wrapper,#mp .leaflet-popup-tip{background:var(--card2);color:var(--tx)}
+#mp a{color:var(--cy)}
+.st table{min-width:0}
+.st th,.st td{padding:9px 11px;font-size:13.5px}
+.st2{grid-template-columns:1fr 1fr}.st3{grid-template-columns:1fr 1.6fr}
+@media(max-width:900px){.st2,.st3{grid-template-columns:1fr}}
 svg text{font-family:Tajawal,sans-serif}
 .bar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13.5px}
 .bar .l{width:88px;color:var(--mut);flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -155,6 +163,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
     <button class="nav" data-t="lib"><i>📚</i>المكتبة</button>
     <button class="nav" data-t="mod"><i>🛡</i>الرقابة<span class="bd hide" id="mb"></span></button>
     <button class="nav" data-t="log"><i>📜</i>سجل الإدارة</button>
+    <button class="nav" data-t="st"><i>📈</i>النمو</button>
     <button class="nav" data-t="set"><i>⚙</i>الإعدادات</button>
     <div class="side-foot"><div id="me" style="word-break:break-all;margin-bottom:8px"></div><button class="btn sm" id="out">تسجيل الخروج</button></div>
   </aside>
@@ -170,6 +179,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:rgba(255,255,255,.03)}
     <section id="v-mod" class="hide"></section>
     <section id="v-log" class="hide"></section>
     <section id="v-set" class="hide"></section>
+    <section id="v-st" class="hide"></section>
   </main>
 </div>
 <div id="dw"></div>
@@ -182,7 +192,7 @@ const sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefr
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=n=>Number(n||0).toLocaleString('en-US');
-const TITLES={lib:'المكتبة ورفع الكتب',push:'إرسال إشعار',ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة',set:'الإعدادات'};
+const TITLES={lib:'المكتبة ورفع الكتب',push:'إرسال إشعار',ov:'نظرة عامة',live:'البث المباشر',users:'المستخدمون',mod:'الرقابة والبلاغات',log:'سجل الإدارة',set:'الإعدادات',st:'النمو والإحصاءات'};
 const EV={
  signup:['👤','تسجيل جديد','var(--gr)'],login:['🔑','دخول','var(--cy)'],post:['💬','منشور بالمنتدى','var(--vi)'],comment:['↩️','تعليق','var(--vi)'],
  forum_report:['🚩','بلاغ منتدى','var(--rd)'],report:['📩','رسالة/بلاغ للدعم','var(--or)'],admin:['🛠','إجراء إداري','var(--gold)'],broadcast:['📣','إشعار جماعي','var(--gold)'],
@@ -223,10 +233,10 @@ document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.t));
 $('#rf').onclick=()=>load(true);
 function go(t){tab=t;try{localStorage.setItem('tab',t)}catch(_){}
   document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
-  ['ov','live','users','push','lib','mod','log','set'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
+  ['ov','live','users','push','lib','mod','log','set','st'].forEach(k=>$('#v-'+k).classList.toggle('hide',k!==t));
   $('#ttl').textContent=TITLES[t];window.scrollTo(0,0);load(false)}
 async function load(force){
-  try{({ov:vOverview,live:vLive,users:vUsers,push:vPush,lib:vLib,mod:vMod,log:vLog,set:vSettings})[tab](force);setLive(true)}catch(e){setLive(false)}}
+  try{({ov:vOverview,live:vLive,users:vUsers,push:vPush,lib:vLib,mod:vMod,log:vLog,set:vSettings,st:vStats})[tab](force);setLive(true)}catch(e){setLive(false)}}
 function setLive(ok){$('#dot').classList.toggle('off',!ok);$('#lt').textContent=ok?'متصل':'انقطع الاتصال'}
 
 /* ===== overview ===== */
@@ -454,6 +464,121 @@ async function delRep(id){if(confirm('حذف البلاغ؟')&&await act('admin_
 async function hideF(kind,id,hide){if(await act('forum_mod_hide',{p_kind:kind,p_id:id,p_hide:hide},hide?'تم الإخفاء':'تم الإظهار'))vMod()}
 
 /* ===== log ===== */
+/* ===== النمو والإحصاءات ===== */
+const GH_REPO='Kitabi-dev/kitabi-dev.github.io';
+let stDays=30,stData=null,stMap=null,stMapKind='visits';
+const DEVN={android:'أندرويد',ios:'آيفون',mobile:'جوال آخر',desktop:'حاسوب',other:'أخرى'};
+const KINDN={book_open:'📖 كتب فُتحت',book_download:'⬇ كتب حُمّلت',quiz_answer:'📝 أسئلة اختبار',quiz_explain:'💡 «اشرح لي»',ai_ask:'🤖 أسئلة المعلّم الذكي',video_play:'🎬 فيديوهات'};
+const flag=cc=>/^[A-Za-z]{2}$/.test(cc||'')?String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0)))+' ':'';
+function csvDl(name,rows){const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const t='﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv;charset=utf-8'}));a.download=name+'.csv';
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function lineChart(d,series){
+  const W=700,H=230,P=30,all=series.flatMap(s=>d.map(x=>+x[s.k]||0)),mx=Math.max(1,...all),
+   X=i=>P+i*(W-2*P)/Math.max(1,d.length-1),Y=v=>H-26-(v/mx)*(H-56);
+  const grid=[0,.5,1].map(f=>`<line x1="${P}" x2="${W-P}" y1="${Y(mx*f)}" y2="${Y(mx*f)}" stroke="#232842" stroke-dasharray="3 5"/><text x="${P-6}" y="${Y(mx*f)+4}" fill="#8b91ad" font-size="11" text-anchor="end">${Math.round(mx*f)}</text>`).join('');
+  const step=Math.max(1,Math.ceil(d.length/6));
+  const lbl=d.map((x,i)=>i%step===0?`<text x="${X(i)}" y="${H-6}" fill="#8b91ad" font-size="11" text-anchor="middle">${String(x.d).slice(5)}</text>`:'').join('');
+  const lines=series.map(s=>{const pts=d.map((x,i)=>[X(i),Y(+x[s.k]||0)]);
+    return `<path d="M${pts.map(p=>p.join(',')).join(' L')}" fill="none" stroke="${s.c}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`+
+     pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===pts.length-1?4.5:2}" fill="${s.c}"><title>${s.l} — ${d[i].d}: ${d[i][s.k]}</title></circle>`).join('')}).join('');
+  const leg=series.map(s=>`<span style="margin-left:14px"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${s.c};margin-left:5px"></i>${s.l}: <b>${nf(d.reduce((a,x)=>a+(+x[s.k]||0),0))}</b></span>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;direction:ltr">${grid}${lbl}${lines}</svg><div style="color:var(--mut);font-size:13px;margin-top:6px">${leg}</div>`}
+function tbl(head,rows,empty){return rows.length?`<div class="tw st"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:`<div class="empty">${empty||'لا بيانات بعد'}</div>`}
+function rank(rows,key,lab){const m=Math.max(1,...rows.map(r=>r[key]));return rows.map(r=>`<div class="bar"><span class="l" style="width:150px" title="${esc(r[lab])}">${esc(r[lab])}</span><span class="t"><i style="width:${r[key]/m*100}%"></i></span><span class="v">${nf(r[key])}</span></div>`).join('')}
+async function ghStats(){try{const r=await fetch(`https://api.github.com/repos/${GH_REPO}/releases?per_page=30`);if(!r.ok)throw 0;const j=await r.json();
+  return j.map(x=>({tag:x.tag_name,date:x.published_at,n:(x.assets||[]).filter(a=>/\.apk$/i.test(a.name)).reduce((s,a)=>s+(a.download_count||0),0)}))}catch(_){return null}}
+let lfP=null;
+function loadLeaflet(){if(window.L)return Promise.resolve();if(lfP)return lfP;
+  lfP=new Promise((ok,no)=>{const l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';document.head.appendChild(l);
+   const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';s.onload=ok;s.onerror=()=>{lfP=null;no(new Error('map'))};document.head.appendChild(s)});return lfP}
+const cityName=c=>[c.city,c.region].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join('، ')||'غير محدد';
+function popHtml(c){return `<div style="direction:rtl;text-align:right;min-width:150px"><b>${esc(cityName(c))}</b><br>${esc(c.country)}<br>زيارات: <b>${nf(c.visits)}</b> · تحميل: <b>${nf(c.downloads)}</b><br><small style="opacity:.75">موقع تقريبي على مستوى المدينة</small><br><a target="_blank" rel="noopener" href="https://www.google.com/maps?q=${c.lat},${c.lon}">فتح في خرائط قوقل ↗</a></div>`}
+async function drawMap(){const el=$('#mp');if(!el)return;
+  try{await loadLeaflet()}catch(_){el.innerHTML='<div class="empty">تعذّر تحميل الخريطة، تحقق من الاتصال ثم حدّث</div>';return}
+  if(stMap){stMap.remove();stMap=null}
+  stMap=L.map(el).setView([27.5,17.5],5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(stMap);
+  const pts=((stData.site||{}).cities||[]).filter(c=>c.lat!=null&&c.lon!=null&&c[stMapKind]>0);
+  const mx=Math.max(1,...pts.map(c=>c[stMapKind])),g=L.featureGroup();
+  pts.forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7+Math.sqrt(c[stMapKind]/mx)*18,color:stMapKind==='downloads'?'#3ddc97':'#e8c46a',weight:2,fillOpacity:.35}).bindPopup(popHtml(c)).addTo(g));
+  g.addTo(stMap);if(pts.length)stMap.fitBounds(g.getBounds().pad(.35),{maxZoom:9});
+  setTimeout(()=>stMap&&stMap.invalidateSize(),150)}
+async function focusCity(i){const c=stData.site.cities[i];if(!c||c.lat==null)return;
+  if(!stMap)await drawMap();if(!stMap)return;
+  $('#mp').scrollIntoView({behavior:'smooth',block:'center'});
+  stMap.setView([c.lat,c.lon],11);L.popup().setLatLng([c.lat,c.lon]).setContent(popHtml(c)).openOn(stMap)}
+function weeklyText(){const s=stData.site||{},u=stData.users||{},gh=stData.gh;
+  const tot=gh?gh.reduce((a,x)=>a+x.n,0):null,cs=(s.countries||[]).slice(0,3).map(c=>`${c.country} (${c.visits})`).join('، '),ct=(s.cities||[]).slice(0,3).map(c=>`${cityName(c)} (${c.visits})`).join('، ');
+  return [`📊 تقرير معلّمي — آخر ${stDays} يوم`,tot!=null?`• تحميلات التطبيق من الموقع (الإجمالي): ${nf(tot)}`:'',
+   `• زوار الموقع: ${nf(s.visits)} · نقرات زر التحميل: ${nf(s.downloads)}`,
+   `• المستخدمون: ${nf(u.users)} (+${nf(u.new_7d)} هذا الأسبوع) · نشطون اليوم ${nf(u.dau)} · هذا الأسبوع ${nf(u.wau)}`,
+   cs?`• أعلى الدول: ${cs}`:'',ct?`• أعلى المدن: ${ct}`:''].filter(Boolean).join('\n')}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(_){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}toast('تم النسخ ✓')}
+async function vStats(force){
+  const safe=(p)=>p.catch(e=>({__err:e.message||String(e)}));
+  const [site,users,content,gh]=await Promise.all([safe(rpc('admin_site_stats',{p_days:stDays})),safe(rpc('admin_user_stats',{p_days:30})),safe(rpc('admin_content_stats',{p_days:stDays})),ghStats()]);
+  stData={site:site.__err?null:site,users:users.__err?null:users,content:content.__err?null:content,gh};
+  const errs=[site,users,content].filter(x=>x&&x.__err).map(x=>x.__err);
+  const s=stData.site,u=stData.users,c=stData.content;
+  const ghTot=gh?gh.reduce((a,x)=>a+x.n,0):null;
+  const conv=s&&s.visits?Math.round(s.downloads/s.visits*100):0;
+  const stick=u&&u.mau?Math.round(u.dau/u.mau*100):0;
+  const ret=u&&u.retained&&u.retained.cohort?Math.round(u.retained.back/u.retained.cohort*100):null;
+  let h=`<div class="tabs" id="stp">${[[7,'7 أيام'],[30,'30 يومًا'],[90,'90 يومًا']].map(([k,l])=>`<button class="chip ${k===stDays?'on':''}" data-k="${k}">${l}</button>`).join('')}
+   <span style="flex:1"></span><button class="btn sm" id="stw">📋 نسخ تقرير للمشاركة</button></div>`;
+  if(errs.length)h+=`<div class="card" style="border-color:var(--rd);margin-bottom:16px"><b style="color:var(--rd)">تعذّر جلب جزء من البيانات</b><div style="color:var(--mut);margin-top:6px;font-size:13.5px;line-height:1.7">${esc(errs[0])}<br>إن كانت الرسالة تخص دالة غير موجودة فشغّل ملف stats_setup.sql على قاعدة البيانات أولًا.</div></div>`;
+  h+=`<div class="grid kpis">
+   ${kpi('تحميلات التطبيق (الإجمالي)',ghTot==null?0:ghTot,ghTot==null?'تعذّر الاتصال بـ GitHub':'من صفحات الإصدارات على GitHub','var(--gr)','⬇')}
+   ${kpi('نقرات زر التحميل',s?s.downloads:0,s?`${nf(s.downloaders)} زائر مختلف · آخر ${stDays} يوم`:'—','var(--gold)','👆')}
+   ${kpi('زوار الموقع',s?s.visits:0,s?`نسبة التحميل ${conv}%`:'—','var(--cy)','🌐')}
+   ${kpi('إجمالي المستخدمين',u?u.users:0,u?`+${nf(u.new_7d)} أسبوع · +${nf(u.new_30d)} شهر`:'—','var(--gold)','👥')}
+   ${kpi('نشطون اليوم',u?u.dau:0,u?`تمسّك DAU/MAU ${stick}%`:'—','var(--gr)','🟢')}
+   ${kpi('نشطون هذا الأسبوع',u?u.wau:0,ret==null?'—':`عاد ${ret}% ممن سجّلوا قبل 7–30 يومًا`,'var(--vi)','📆')}
+   ${kpi('نشطون هذا الشهر',u?u.mau:0,u?`${u.tasks?nf(u.tasks.done):0} مهمة منجزة من ${u.tasks?nf(u.tasks.total):0}`:'—','var(--or)','🗓')}
+  </div>`;
+  h+=`<div class="grid st2" style="margin-bottom:16px">
+   <div class="card"><h3>🌐 الزيارات والتحميلات</h3>${s?lineChart(s.series,[{k:'visits',l:'زيارات',c:'#52d6ff'},{k:'downloads',l:'نقرات تحميل',c:'#3ddc97'}]):'<div class="empty">—</div>'}</div>
+   <div class="card"><h3>👥 المستخدمون النشطون والجدد (30 يومًا)</h3>${u?lineChart(u.series,[{k:'active',l:'نشطون',c:'#e8c46a'},{k:'new',l:'جدد',c:'#9a7bff'}]):'<div class="empty">—</div>'}</div></div>`;
+  h+=`<div class="card" style="margin-bottom:16px"><h3>🗺 خريطة الزوار</h3>
+   <div class="tabs" id="stm"><button class="chip ${stMapKind==='visits'?'on':''}" data-k="visits">الزيارات</button><button class="chip ${stMapKind==='downloads'?'on':''}" data-k="downloads">نقرات التحميل</button></div>
+   <div id="mp"></div><div style="color:var(--mut);font-size:12.5px;margin-top:8px">الموقع تقريبي على مستوى المدينة (يُستنتج من عنوان الاتصال) ولا يمثل عنوان شخص بعينه. عنوان الاتصال نفسه لا يُحفظ.</div></div>`;
+  const cities=s?s.cities:[];
+  h+=`<div class="grid three" style="margin-bottom:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+   <div class="card"><h3>🏳️ الدول</h3>${tbl(['الدولة','زيارات','تحميل'],s?s.countries.map(x=>[flag(x.cc)+esc(x.country),nf(x.visits),nf(x.downloads)]):[])}</div>
+   <div class="card"><h3>📍 المدن <button class="btn sm" id="stc1" style="margin-right:auto">⬇ CSV</button></h3>${tbl(['المدينة','زيارات','تحميل','الموقع'],cities.map((x,i)=>[esc(cityName(x))+`<br><small style="color:var(--mut)">${esc(x.country)}</small>`,nf(x.visits),nf(x.downloads),x.lat!=null?`<button class="btn sm" onclick="focusCity(${i})">📍 حدّد</button>`:'—']))}</div>
+   <div class="card"><h3>🔗 مصادر الزيارة</h3>${tbl(['المصدر','زيارات','تحميل'],s?s.refs.map(x=>[esc(x.ref),nf(x.visits),nf(x.downloads)]):[])}
+    <div style="margin:14px 0 8px;color:var(--mut);font-size:13px">الأجهزة</div>${s?bars(Object.fromEntries(Object.entries(s.devices||{}).map(([k,v])=>[DEVN[k]||k,v]))):''}
+    <div style="color:var(--mut);font-size:12.5px;margin-top:10px;line-height:1.7">لمعرفة مصدر كل منصة ضع في رابط البايو: <span dir="ltr" style="color:var(--tx)">?src=fb</span> أو <span dir="ltr" style="color:var(--tx)">?src=tiktok</span> أو <span dir="ltr" style="color:var(--tx)">?src=ig</span> أو <span dir="ltr" style="color:var(--tx)">?src=wa</span></div></div></div>`;
+  if(u){const gs=[...new Set(u.matrix.map(m=>m.grade))].sort((a,b)=>String(a).localeCompare(String(b),'en',{numeric:true})),rg=u.regions.map(r=>r.region),
+    cell={};u.matrix.forEach(m=>cell[m.region+'|'+m.grade]=m.n);const mxc=Math.max(1,...u.matrix.map(m=>m.n));
+    h+=`<div class="grid st3" style="margin-bottom:16px">
+     <div class="card"><h3>📍 المستخدمون حسب المنطقة <button class="btn sm" id="stc2" style="margin-right:auto">⬇ CSV</button></h3>${bars(Object.fromEntries(u.regions.map(r=>[r.region,r.n])))}</div>
+     <div class="card"><h3>🎓 المنطقة × الصف</h3><div class="tw st"><table><thead><tr><th>المنطقة</th>${gs.map(g=>`<th>${esc(GR[g]||g)}</th>`).join('')}</tr></thead><tbody>${rg.map(r=>`<tr><td>${esc(r)}</td>${gs.map(g=>{const v=cell[r+'|'+g]||0;return `<td style="background:rgba(232,196,106,${v?(.08+.5*v/mxc).toFixed(2):0});text-align:center">${v||''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div></div></div>
+     <div class="card" style="margin-bottom:16px"><h3>📈 تقدّم الطلاب حسب المادة</h3>${tbl(['المادة','طلاب','متوسط الإنجاز'],u.subjects.map(x=>[esc(x.subject),nf(x.users),`<div class="bar" style="margin:0"><span class="t"><i style="width:${x.pct||0}%"></i></span><span class="v">${x.pct||0}%</span></div>`]),'لا بيانات تقدّم بعد')}</div>`}
+  h+=`<div class="card" style="margin-bottom:16px"><h3>🔥 الأكثر استخدامًا</h3>`;
+  if(!c||!c.events)h+=`<div class="empty" style="line-height:1.9">لم يسجّل التطبيق أي أحداث استخدام بعد.<br>تمتلئ هذه البطاقة تلقائيًا (أكثر الكتب فتحًا وتحميلًا، أكثر الأسئلة، «اشرح لي»…) بعد أن يرسل التطبيق حدثًا عبر <span dir="ltr">log_app_event</span> عند كل فتح كتاب أو إجابة سؤال، وهذا يحتاج تحديثًا صغيرًا للتطبيق.</div>`;
+  else{const by={};(c.top||[]).forEach(r=>(by[r.kind]=by[r.kind]||[]).push(r));
+    h+=`<div class="sg">${Object.keys(KINDN).filter(k=>by[k]).map(k=>`<div><h4 style="color:var(--gold);margin-bottom:6px">${KINDN[k]} <small style="color:var(--mut)">(${nf((c.kinds||{})[k])})</small></h4>${rank(by[k],'n','label')}</div>`).join('')}</div>`}
+  h+=`</div>`;
+  h+=`<div class="card" style="margin-bottom:16px"><h3>🏷 تحميلات كل إصدار (GitHub)</h3>${gh?tbl(['الإصدار','تاريخ النشر','التحميلات'],gh.map(x=>[esc(x.tag),x.date?new Date(x.date).toLocaleDateString('ar-LY'):'—',nf(x.n)]),'لا توجد إصدارات'):'<div class="empty">تعذّر جلب بيانات GitHub (قد تكون وصلت لحد الطلبات، حاول بعد قليل)</div>'}
+   <div style="color:var(--mut);font-size:12.5px;margin-top:8px">الأرقام تشمل كل من حمّل الملف من الموقع أو من الرابط المباشر، وقد تُحسب إعادة التحميل.</div></div>
+   <div class="card"><h3>📤 تصدير</h3><div class="row" style="margin:0"><button class="btn" id="ex1">⬇ الزيارات والتحميلات اليومية</button><button class="btn" id="ex2">⬇ المدن</button><button class="btn" id="ex3">⬇ المستخدمون النشطون</button></div></div>`;
+  $('#v-st').innerHTML=h;
+  document.querySelectorAll('#v-st .kpi .n').forEach(e=>countUp(e,+e.dataset.n));
+  document.querySelectorAll('#stp .chip').forEach(b=>b.onclick=()=>{stDays=+b.dataset.k;vStats(true)});
+  document.querySelectorAll('#stm .chip').forEach(b=>b.onclick=()=>{stMapKind=b.dataset.k;document.querySelectorAll('#stm .chip').forEach(x=>x.classList.toggle('on',x===b));drawMap()});
+  $('#stw').onclick=()=>copyText(weeklyText());
+  const dl=(id,fn)=>{const e=$(id);if(e)e.onclick=fn};
+  dl('#ex1',()=>s&&csvDl('visits_downloads',[['التاريخ','زيارات','نقرات تحميل'],...s.series.map(x=>[x.d,x.visits,x.downloads])]));
+  dl('#ex2',()=>s&&csvDl('cities',[['الدولة','المنطقة','المدينة','خط العرض','خط الطول','زيارات','نقرات تحميل'],...s.cities.map(x=>[x.country,x.region,x.city,x.lat,x.lon,x.visits,x.downloads])]));
+  dl('#stc1',()=>$('#ex2').click());
+  dl('#ex3',()=>u&&csvDl('active_users',[['التاريخ','نشطون','مسجّلون جدد'],...u.series.map(x=>[x.d,x.active,x.new])]));
+  dl('#stc2',()=>u&&csvDl('regions',[['المنطقة','المستخدمون'],...u.regions.map(x=>[x.region,x.n])]));
+  drawMap();
+}
+
 /* ===== الإعدادات ===== */
 let SET={};
 async function setK(k,v){await rpc('set_app_setting',{p_key:k,p_value:String(v)});SET[k]=String(v)}

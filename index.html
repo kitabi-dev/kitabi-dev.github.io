@@ -278,6 +278,18 @@ const CFG={
 const dlUrl=`https://github.com/${CFG.repo}/releases/latest/download/${CFG.apkName}`;
 document.querySelectorAll('a.dl').forEach(a=>{a.href=dlUrl;a.setAttribute('download','')});
 if(CFG.apkpure){document.querySelectorAll('a.dl2').forEach(a=>{a.href=CFG.apkpure;a.style.display='';a.target='_blank'})}
+/* إحصاءات الزيارة (بلا تخزين IP) */
+const TRK='https://cqufhwvbyxqddsammqks.supabase.co/functions/v1/track';
+function trk(k,v){try{
+  const day=new Date().toISOString().slice(0,10);
+  if(k==='visit'){try{if(localStorage.getItem('mv')===day)return;localStorage.setItem('mv',day)}catch(_){}}
+  const q=new URLSearchParams(location.search);
+  fetch(TRK,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({k,ref:document.referrer,src:q.get('src')||q.get('utm_source')||'',v:v||CFG.version})}).catch(()=>{});
+}catch(_){}}
+trk('visit');
+document.querySelectorAll('a.dl').forEach(a=>a.addEventListener('click',()=>trk('download')));
+document.querySelectorAll('a.dl2').forEach(a=>a.addEventListener('click',()=>trk('download','apkpure')));
 const ua=navigator.userAgent||'';
 if(!/Android/i.test(ua)){document.getElementById('note').textContent='💡 افتح هذه الصفحة من هاتف أندرويد لتثبيت التطبيق.'}
 (async()=>{try{
