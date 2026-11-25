@@ -565,6 +565,7 @@ async function vStats(force){
   h+=`<div class="card" style="margin-bottom:16px"><h3>🏷 تحميلات كل إصدار (GitHub)</h3>${gh?tbl(['الإصدار','تاريخ النشر','التحميلات'],gh.map(x=>[esc(x.tag),x.date?new Date(x.date).toLocaleDateString('ar-LY'):'—',nf(x.n)]),'لا توجد إصدارات'):'<div class="empty">تعذّر جلب بيانات GitHub (قد تكون وصلت لحد الطلبات، حاول بعد قليل)</div>'}
    <div style="color:var(--mut);font-size:12.5px;margin-top:8px">الأرقام تشمل كل من حمّل الملف من الموقع أو من الرابط المباشر، وقد تُحسب إعادة التحميل.</div></div>
    <div class="card"><h3>📤 تصدير</h3><div class="row" style="margin:0"><button class="btn" id="ex1">⬇ الزيارات والتحميلات اليومية</button><button class="btn" id="ex2">⬇ المدن</button><button class="btn" id="ex3">⬇ المستخدمون النشطون</button></div></div>`;
+  h+=qrCardHtml();
   $('#v-st').innerHTML=h;
   document.querySelectorAll('#v-st .kpi .n').forEach(e=>countUp(e,+e.dataset.n));
   document.querySelectorAll('#stp .chip').forEach(b=>b.onclick=()=>{stDays=+b.dataset.k;vStats(true)});
@@ -576,8 +577,32 @@ async function vStats(force){
   dl('#stc1',()=>$('#ex2').click());
   dl('#ex3',()=>u&&csvDl('active_users',[['التاريخ','نشطون','مسجّلون جدد'],...u.series.map(x=>[x.d,x.active,x.new])]));
   dl('#stc2',()=>u&&csvDl('regions',[['المنطقة','المستخدمون'],...u.regions.map(x=>[x.region,x.n])]));
+  qrInit();
   drawMap();
 }
+
+/* ===== مولّد رموز QR ===== */
+const QRSRC=[['fb','فيسبوك'],['tiktok','تيك توك'],['ig','إنستغرام'],['wa','واتساب'],['dc','ديسكورد'],['poster','ملصق/مدرسة'],['custom','مخصّص…']];
+let qrSrc='fb',qrCustom='',qrLoadA=null;
+function loadQRA(){if(window.QR)return Promise.resolve();return qrLoadA||(qrLoadA=new Promise((ok,no)=>{const s=document.createElement('script');s.src='../qr.js';s.onload=ok;s.onerror=()=>{qrLoadA=null;no()};document.head.appendChild(s)}))}
+function qrUrl(){let s=qrSrc==='custom'?qrCustom:qrSrc;s=String(s||'').toLowerCase().replace(/[^a-z0-9_.-]/g,'').slice(0,30);return 'https://kitabi-dev.github.io/'+(s?'?src='+s:'')}
+function qrCardHtml(){return `<div class="card" style="margin-bottom:16px"><h3>🔳 مولّد رموز QR</h3>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));align-items:start"><div>
+   <div class="tabs" id="qrs">${QRSRC.map(([k,l])=>`<button class="chip ${k===qrSrc?'on':''}" data-k="${k}">${l}</button>`).join('')}</div>
+   <input id="qrc" placeholder="كلمة مخصّصة بالإنجليزي، مثال: school1" maxlength="30" style="margin-bottom:10px;direction:ltr;${qrSrc==='custom'?'':'display:none'}" value="${esc(qrCustom)}">
+   <div class="row" style="margin:0"><button class="btn" id="qrd1">⬇ PNG</button><button class="btn" id="qrd2">⬇ SVG</button><button class="btn" id="qrd3">📋 نسخ الرابط</button></div>
+   <div id="qru" dir="ltr" style="margin-top:10px;color:var(--tx);font-size:13px;word-break:break-all"></div>
+   <div style="color:var(--mut);font-size:12.5px;margin-top:8px;line-height:1.7">كل رمز يفتح صفحة التحميل ويسجّل مصدره في جدول «مصادر الزيارة». اطبعه على ملصق أو ضعه في منشور.</div></div>
+   <div id="qrp" style="background:#fff;border-radius:16px;padding:6px;max-width:300px;min-height:120px"></div></div></div>`}
+async function qrRender(){const u=qrUrl();$('#qru').textContent=u;
+  try{await loadQRA();$('#qrp').innerHTML=QR.svg(u)}catch(_){$('#qrp').innerHTML='<div class="empty" style="color:#555">تعذّر تحميل مكتبة الرمز</div>'}}
+function qrInit(){
+  document.querySelectorAll('#qrs .chip').forEach(b=>b.onclick=()=>{qrSrc=b.dataset.k;document.querySelectorAll('#qrs .chip').forEach(x=>x.classList.toggle('on',x===b));$('#qrc').style.display=qrSrc==='custom'?'':'none';qrRender()});
+  $('#qrc').oninput=e=>{qrCustom=e.target.value;qrRender()};
+  $('#qrd1').onclick=async()=>{try{await loadQRA();QR.canvas(qrUrl(),1024).toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='moalemi-qr-'+(qrUrl().split('src=')[1]||'main')+'.png';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)})}catch(_){toast('تعذّر إنشاء الصورة')}};
+  $('#qrd2').onclick=async()=>{try{await loadQRA();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([QR.svg(qrUrl())],{type:'image/svg+xml'}));a.download='moalemi-qr-'+(qrUrl().split('src=')[1]||'main')+'.svg';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}catch(_){toast('تعذّر إنشاء الملف')}};
+  $('#qrd3').onclick=()=>copyText(qrUrl());
+  qrRender()}
 
 /* ===== الإعدادات ===== */
 let SET={};
